@@ -66,7 +66,7 @@ export default async function AdminDashboard() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard title="Total Dokumen" value={totalDokumen} icon={FileText} color="blue" />
         <StatCard title="User Aktif" value={totalUser} icon={Users} color="green" />
         <StatCard title="Antrian Arsip" value={menungguArsip} icon={Clock} color="yellow" subtitle="Perlu diarsipkan" />
@@ -161,7 +161,7 @@ export default async function AdminDashboard() {
         <h2 className="font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
           <Activity className="w-4 h-4 text-blue-600 dark:text-blue-400" /> Distribusi Status Dokumen
         </h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
           {Object.entries(statusCounts).map(([status, count]) => (
             <div key={status} className="text-center p-3 bg-gray-50 dark:bg-slate-800/50 rounded-xl">
               <p className="text-2xl font-bold text-gray-900 dark:text-white">{count}</p>

@@ -88,7 +88,7 @@ export default async function StaffDocumentDetail(props: Params) {
               <StatusBadge status={doc.currentStatus} />
             </div>
 
-            <div className="grid grid-cols-2 gap-4 text-sm">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
               <InfoRow icon={FileText} label="Nomor Surat" value={doc.nomorSurat} mono />
               <InfoRow icon={Calendar} label="Tanggal Surat"
                 value={format(new Date(doc.tanggalSurat), "dd MMMM yyyy", { locale: localeId })} />

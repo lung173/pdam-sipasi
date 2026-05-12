@@ -42,7 +42,7 @@ export default async function AdminUsersPage() {
       </div>
 
       {/* Summary cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
         {(["ADMIN_STAFF", "AGENDARIS", "DIREKTUR"] as UserRole[]).map((role) => {
           const count = users.filter((u) => u.role === role && u.isActive).length;
           return (

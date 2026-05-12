@@ -112,38 +112,38 @@ export default function AdminArsipDetailClient({ doc, staffUsers }: { doc: any; 
                 </div>
               </div>
 
-              <div className="border-2 border-gray-400 rounded-lg overflow-hidden text-sm bg-white">
+              <div className="border-2 border-gray-400 dark:border-slate-600 rounded-lg overflow-hidden text-sm bg-white dark:bg-slate-900">
                 {/* Header */}
-                <div className="border-b-2 border-gray-400 py-3 px-4 text-center">
-                  <p className="text-[11px] font-bold text-gray-800 uppercase tracking-wide leading-snug">
+                <div className="border-b-2 border-gray-400 dark:border-slate-600 py-3 px-4 text-center">
+                  <p className="text-[11px] font-bold text-gray-800 dark:text-gray-200 uppercase tracking-wide leading-snug">
                     PERUSAHAAN UMUM DAERAH AIR MINUM TIRTA MAKMUR KABUPATEN SUKOHARJO
                   </p>
-                  <p className="text-base font-bold mt-1 tracking-widest text-gray-900">
+                  <p className="text-base font-bold mt-1 tracking-widest text-gray-900 dark:text-white">
                     {doc.documentType === "UNDANGAN" ? "LEMBAR DISPOSISI SURAT UNDANGAN" : "LEMBAR DISPOSISI SURAT MASUK"}
                   </p>
                 </div>
 
                 {/* Info rows */}
-                <div className="divide-y divide-gray-300 border-b-2 border-gray-400 text-xs">
-                  <div className="grid grid-cols-2 divide-x divide-gray-300">
+                <div className="divide-y divide-gray-300 dark:divide-slate-700 border-b-2 border-gray-400 dark:border-slate-600 text-xs">
+                  <div className="grid grid-cols-2 divide-x divide-gray-300 dark:divide-slate-700">
                     <DisposisiRow label="Tanggal Surat" value={format(new Date(doc.tanggalSurat), "dd MMMM yyyy", { locale: localeId })} />
                     <DisposisiRow label="Tanggal Terima" value={format(new Date(doc.tanggalTerima), "dd MMMM yyyy", { locale: localeId })} />
                   </div>
-                  <div className="grid grid-cols-2 divide-x divide-gray-300">
+                  <div className="grid grid-cols-2 divide-x divide-gray-300 dark:divide-slate-700">
                     <DisposisiRow label="Asal Surat" value={doc.asalSurat ?? "-"} />
                     <DisposisiRow label="No. Agenda" value={doc.nomorAgenda ?? "-"} />
                   </div>
-                  <div className="grid grid-cols-2 divide-x divide-gray-300">
+                  <div className="grid grid-cols-2 divide-x divide-gray-300 dark:divide-slate-700">
                     <DisposisiRow label="Perihal" value={doc.perihal} />
                     <DisposisiRow label="Nomor Surat" value={doc.nomorSurat} mono />
                   </div>
                 </div>
 
                 {/* Disposisi Kepada + Tanggal Penyelesaian */}
-                <div className="grid grid-cols-2 divide-x divide-gray-300 border-b-2 border-gray-400 text-xs">
+                <div className="grid grid-cols-2 divide-x divide-gray-300 dark:divide-slate-700 border-b-2 border-gray-400 dark:border-slate-600 text-xs">
                   <div className="p-3">
-                    <p className="font-bold text-gray-700 uppercase tracking-wide mb-2">Disposisi Kepada :</p>
-                    <div className="text-gray-900 font-semibold text-sm">
+                    <p className="font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wide mb-2">Disposisi Kepada :</p>
+                    <div className="text-gray-900 dark:text-gray-100 font-semibold text-sm">
                       {latestDisposisi?.jabatanKe ? (
                         <ul className="list-decimal pl-4 space-y-0.5">
                           {latestDisposisi.jabatanKe.split(",").map((j: string, i: number) => (
@@ -157,8 +157,8 @@ export default function AdminArsipDetailClient({ doc, staffUsers }: { doc: any; 
                   </div>
                   <div className="p-3 space-y-2">
                     <div>
-                      <p className="font-bold text-gray-700 uppercase tracking-wide mb-1">Tanggal Penyelesaian :</p>
-                      <p className="text-blue-700 font-medium">
+                      <p className="font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wide mb-1">Tanggal Penyelesaian :</p>
+                      <p className="text-blue-700 dark:text-blue-400 font-medium">
                         {latestDisposisi?.tanggalTandaTangan
                           ? format(new Date(latestDisposisi.tanggalTandaTangan), "dd MMMM yyyy", { locale: localeId })
                           : "-"}
@@ -166,8 +166,8 @@ export default function AdminArsipDetailClient({ doc, staffUsers }: { doc: any; 
                     </div>
                     {latestDisposisi?.keterangan && (
                       <div>
-                        <p className="font-bold text-gray-700 uppercase tracking-wide mb-1">Catatan :</p>
-                        <p className="text-blue-700 font-medium whitespace-pre-wrap">{latestDisposisi?.keterangan}</p>
+                        <p className="font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wide mb-1">Catatan :</p>
+                        <p className="text-blue-700 dark:text-blue-400 font-medium whitespace-pre-wrap">{latestDisposisi?.keterangan}</p>
                       </div>
                     )}
                   </div>
@@ -175,12 +175,12 @@ export default function AdminArsipDetailClient({ doc, staffUsers }: { doc: any; 
 
                 {/* Instruksi */}
                 <div className="p-3 text-xs">
-                  <p className="font-bold text-gray-700 uppercase tracking-wide mb-1.5">Isi Instruksi / Informasi :</p>
-                  <p className="text-blue-700 font-medium whitespace-pre-wrap leading-relaxed">{latestDisposisi?.instruksi ?? "-"}</p>
+                  <p className="font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wide mb-1.5">Isi Instruksi / Informasi :</p>
+                  <p className="text-blue-700 dark:text-blue-400 font-medium whitespace-pre-wrap leading-relaxed">{latestDisposisi?.instruksi ?? "-"}</p>
                 </div>
 
                 {/* Footer */}
-                <div className="border-t border-gray-200 px-3 py-2 bg-gray-50 flex justify-between text-[10px] text-gray-400">
+                <div className="border-t border-gray-200 dark:border-slate-700 px-3 py-2 bg-gray-50 dark:bg-slate-800/50 flex justify-between text-[10px] text-gray-400 dark:text-slate-500">
                   <span>Dari: {latestDisposisi?.dari?.name ?? "-"}</span>
                   <span>Status: Dikembalikan ke Agendaris</span>
                 </div>
@@ -249,9 +249,9 @@ function InfoRow({ icon: Icon, label, value, mono }: {
 function DisposisiRow({ label, value, mono }: { label: string; value: string; mono?: boolean }) {
   return (
     <div className="flex items-start gap-1 px-3 py-2">
-      <span className="text-xs font-semibold text-gray-600 shrink-0 w-28">{label}</span>
-      <span className="text-xs text-gray-500 shrink-0">:</span>
-      <span className={`text-xs text-gray-900 ml-1 ${mono ? "font-mono" : ""} truncate`}>{value}</span>
+      <span className="text-xs font-semibold text-gray-600 dark:text-gray-400 shrink-0 w-28">{label}</span>
+      <span className="text-xs text-gray-500 dark:text-slate-500 shrink-0">:</span>
+      <span className={`text-xs text-gray-900 dark:text-white ml-1 ${mono ? "font-mono" : ""} truncate`}>{value}</span>
     </div>
   );
 }

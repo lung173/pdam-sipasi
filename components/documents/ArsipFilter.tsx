@@ -26,7 +26,7 @@ export function ArsipFilter() {
 
   return (
     <div className="flex flex-wrap items-center gap-3">
-      <span className="text-sm font-medium text-gray-600">Filter:</span>
+      <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Filter:</span>
       <select
         value={bulan}
         onChange={(e) => update("bulan", e.target.value)}
@@ -50,7 +50,7 @@ export function ArsipFilter() {
       {(bulan || tahun) && (
         <button
           onClick={() => router.push("?")}
-          className="text-xs text-red-500 hover:text-red-700 underline"
+          className="text-xs text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 underline"
         >
           Reset
         </button>

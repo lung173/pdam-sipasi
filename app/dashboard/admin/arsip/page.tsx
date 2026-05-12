@@ -58,8 +58,8 @@ export default async function AdminArsipPage({ searchParams }: Props) {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <Link href="/dashboard/admin" className="p-2 hover:bg-gray-100 rounded-lg">
-          <ArrowLeft className="w-5 h-5 text-gray-600" />
+        <Link href="/dashboard/admin" className="p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg">
+          <ArrowLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
         </Link>
         <div>
           <h1 className="page-title">Pengarsipan Digital</h1>
@@ -69,12 +69,12 @@ export default async function AdminArsipPage({ searchParams }: Props) {
 
       {/* Antrian Arsip */}
       <div className="card">
-        <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+        <div className="px-5 py-4 border-b border-gray-100 dark:border-slate-800 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Archive className="w-5 h-5 text-teal-600" />
-            <h2 className="font-semibold text-gray-900">Antrian Arsip</h2>
+            <h2 className="font-semibold text-gray-900 dark:text-white">Antrian Arsip</h2>
             {antrianDocs.length > 0 && (
-              <span className="px-2 py-0.5 bg-teal-100 text-teal-700 text-xs font-bold rounded-full">
+              <span className="px-2 py-0.5 bg-teal-100 dark:bg-teal-900/30 text-teal-700 dark:text-teal-400 text-xs font-bold rounded-full">
                 {antrianDocs.length}
               </span>
             )}
@@ -102,10 +102,10 @@ export default async function AdminArsipPage({ searchParams }: Props) {
                   <th className="table-th text-center">Aksi</th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-100">
+              <tbody className="bg-white dark:bg-slate-900 divide-y divide-gray-100 dark:divide-slate-800">
                 {antrianDocs.map((doc) => (
-                  <tr key={doc.id} className="hover:bg-gray-50">
-                    <td className="table-td font-mono text-xs text-blue-700 whitespace-nowrap">
+                  <tr key={doc.id} className="hover:bg-gray-50 dark:hover:bg-slate-800/50">
+                    <td className="table-td font-mono text-xs text-blue-700 dark:text-blue-400 whitespace-nowrap">
                       {doc.nomorSurat}
                     </td>
                     <td className="table-td max-w-xs">
@@ -160,8 +160,8 @@ export default async function AdminArsipPage({ searchParams }: Props) {
 
       {/* Riwayat arsip */}
       <div className="card">
-        <div className="px-5 py-4 border-b border-gray-100 flex flex-wrap items-center justify-between gap-3">
-          <h2 className="font-semibold text-gray-900">Riwayat Arsip Tersimpan</h2>
+        <div className="px-5 py-4 border-b border-gray-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3">
+          <h2 className="font-semibold text-gray-900 dark:text-white">Riwayat Arsip Tersimpan</h2>
           <Suspense>
             <ArsipFilter />
           </Suspense>
@@ -183,20 +183,20 @@ export default async function AdminArsipPage({ searchParams }: Props) {
                   <th className="table-th text-center">Aksi</th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-100">
+              <tbody className="bg-white dark:bg-slate-900 divide-y divide-gray-100 dark:divide-slate-800">
                 {archivedDocs.map((doc) => (
-                  <tr key={doc.id} className="hover:bg-gray-50">
-                    <td className="table-td font-mono text-xs text-blue-700">{doc.nomorSurat}</td>
+                  <tr key={doc.id} className="hover:bg-gray-50 dark:hover:bg-slate-800/50">
+                    <td className="table-td font-mono text-xs text-blue-700 dark:text-blue-400">{doc.nomorSurat}</td>
                     <td className="table-td max-w-xs">
                       <p className="truncate font-medium">{doc.perihal}</p>
                     </td>
                     <td className="table-td">{doc.createdBy.name}</td>
                     <td className="table-td">
-                      <code className="text-xs bg-gray-100 px-1.5 py-0.5 rounded text-gray-600">
+                      <code className="text-xs bg-gray-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-gray-600 dark:text-gray-400">
                         {doc.archive?.serverLocation ?? "-"}
                       </code>
                     </td>
-                    <td className="table-td whitespace-nowrap text-gray-500">
+                    <td className="table-td whitespace-nowrap text-gray-500 dark:text-gray-400">
                       {doc.archive
                         ? format(new Date(doc.archive.archivedAt), "dd MMM yyyy", { locale: localeId })
                         : "-"}
@@ -207,7 +207,7 @@ export default async function AdminArsipPage({ searchParams }: Props) {
                     <td className="table-td text-center">
                       <Link
                         href={`/dashboard/admin/arsip/${doc.id}`}
-                        className="inline-flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 hover:bg-blue-50 px-2.5 py-1.5 rounded-lg transition-colors font-medium border border-blue-100"
+                        className="inline-flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/30 px-2.5 py-1.5 rounded-lg transition-colors font-medium border border-blue-100 dark:border-blue-900/50"
                       >
                         <Eye className="w-3.5 h-3.5" /> Detail
                       </Link>

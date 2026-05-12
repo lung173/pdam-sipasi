@@ -116,7 +116,7 @@ export function TopBar({ user, onMenuToggle }: Props) {
       </div>
 
       {/* Global Search Bar */}
-      <div className="hidden lg:flex items-center flex-1 max-w-md mx-8">
+      <div className="hidden md:flex items-center flex-1 max-w-md mx-8">
         <form
           onSubmit={(e) => {
             e.preventDefault();

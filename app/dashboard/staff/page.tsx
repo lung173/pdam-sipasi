@@ -48,7 +48,7 @@ export default async function StaffDashboard() {
       </div>
 
       {/* Stat cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
         <StatCard title="Total Dokumen"  value={total}       icon={FileText}      color="blue" />
         <StatCard title="Draft"           value={draft}       icon={FileText}      color="yellow" />
         <StatCard title="Dalam Proses"    value={menunggu}    icon={Clock}         color="purple" />

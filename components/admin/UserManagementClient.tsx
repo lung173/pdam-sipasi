@@ -175,11 +175,11 @@ export function UserManagementClient({
             <tr>
               <th className="table-th">Nama</th>
               <th className="table-th">Email</th>
-              <th className="table-th">Role</th>
-              <th className="table-th">Divisi</th>
-              <th className="table-th">Dokumen</th>
+              <th className="table-th hidden sm:table-cell">Role</th>
+              <th className="table-th hidden md:table-cell">Divisi</th>
+              <th className="table-th hidden lg:table-cell">Dokumen</th>
               <th className="table-th">Status</th>
-              <th className="table-th">Dibuat</th>
+              <th className="table-th hidden md:table-cell">Dibuat</th>
               <th className="table-th text-center">Aksi</th>
             </tr>
           </thead>
@@ -188,13 +188,13 @@ export function UserManagementClient({
               <tr key={u.id} className={`hover:bg-gray-50 dark:hover:bg-slate-800/50 ${!u.isActive ? "opacity-60" : ""}`}>
                 <td className="table-td font-medium">{u.name}</td>
                 <td className="table-td text-gray-500 dark:text-slate-400">{u.email}</td>
-                <td className="table-td">
+                <td className="table-td hidden sm:table-cell">
                   <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${ROLE_COLORS[u.role]}`}>
                     {ROLE_LABELS[u.role]}
                   </span>
                 </td>
-                <td className="table-td text-gray-500 dark:text-slate-400">{u.divisi ?? "-"}</td>
-                <td className="table-td text-center">{u.docCount}</td>
+                <td className="table-td text-gray-500 dark:text-slate-400 hidden md:table-cell">{u.divisi ?? "-"}</td>
+                <td className="table-td text-center hidden lg:table-cell">{u.docCount}</td>
                 <td className="table-td">
                   <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
                     u.isActive ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400" : "bg-gray-100 dark:bg-slate-700 text-gray-500 dark:text-slate-400"
@@ -202,7 +202,7 @@ export function UserManagementClient({
                     {u.isActive ? "Aktif" : "Nonaktif"}
                   </span>
                 </td>
-                <td className="table-td text-gray-400 dark:text-slate-500 whitespace-nowrap">
+                <td className="table-td text-gray-400 dark:text-slate-500 whitespace-nowrap hidden md:table-cell">
                   {format(new Date(u.createdAt), "dd MMM yyyy", { locale: localeId })}
                 </td>
                 <td className="table-td">
@@ -274,7 +274,7 @@ export function UserManagementClient({
                 <input type="password" className="form-input" placeholder="Min. 8 karakter, huruf kapital + angka" value={form.password} onChange={setF("password")} />
                 {errors.password && <p className="form-error">{errors.password}</p>}
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="form-label">Role</label>
                   <select className="form-input" value={form.role} onChange={setF("role")}>
