@@ -61,7 +61,7 @@ export async function GET(req: NextRequest) {
               id: `review-${doc.id}`,
               title: "Surat Baru",
               message: `Surat baru dari Staff: "${doc.perihal}"`,
-              link: `/dashboard/admin/inbox`,
+              link: `/dashboard/admin/dokumen/${doc.id}`,
               type: "info",
             });
           } else if (doc.currentStatus === "KEPUTUSAN_DIREKTUR_SELESAI") {
@@ -69,7 +69,7 @@ export async function GET(req: NextRequest) {
               id: `finish-${doc.id}`,
               title: "Keputusan Selesai",
               message: `Direktur telah memutuskan surat "${doc.perihal}".`,
-              link: `/dashboard/admin/inbox`,
+              link: `/dashboard/admin/dokumen/${doc.id}`,
               type: "success",
             });
           } else {
@@ -77,7 +77,7 @@ export async function GET(req: NextRequest) {
               id: `archive-${doc.id}`,
               title: "Menunggu Arsip",
               message: `Scan final diunggah untuk surat "${doc.perihal}".`,
-              link: `/dashboard/admin/inbox`,
+              link: `/dashboard/admin/dokumen/${doc.id}`,
               type: "info",
             });
           }
@@ -98,13 +98,21 @@ export async function GET(req: NextRequest) {
             id: `decision-${doc.id}`,
             title: "Butuh Keputusan",
             message: `Menunggu tanda tangan/disposisi: "${doc.perihal}"`,
-            link: `/dashboard/direktur/inbox`,
+            link: `/dashboard/direktur/dokumen/${doc.id}`,
             type: "urgent",
           });
         });
       }
 
-      return successResponse(notifications);
+      // Filter dismissed notifications
+      const dismissed = await prisma.dismissedNotification.findMany({
+        where: { userId: user.id },
+        select: { notifKey: true },
+      });
+      const dismissedKeys = new Set(dismissed.map((d) => d.notifKey));
+      const filtered = notifications.filter((n) => !dismissedKeys.has(n.id));
+
+      return successResponse(filtered);
     } catch (error) {
       console.error("[GET /api/notifications]", error);
       return errorResponse("Gagal mengambil notifikasi.");

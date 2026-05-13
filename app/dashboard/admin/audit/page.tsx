@@ -44,8 +44,8 @@ export default async function AuditLogPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <Link href="/dashboard/admin" className="p-2 hover:bg-gray-100 rounded-lg">
-          <ArrowLeft className="w-5 h-5 text-gray-600" />
+        <Link href="/dashboard/admin" className="p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg">
+          <ArrowLeft className="w-5 h-5 text-gray-600 dark:text-slate-400" />
         </Link>
         <div>
           <h1 className="page-title">Audit Log Sistem</h1>
@@ -54,9 +54,9 @@ export default async function AuditLogPage() {
       </div>
 
       <div className="card">
-        <div className="px-5 py-4 border-b border-gray-100 flex items-center gap-2">
-          <Activity className="w-5 h-5 text-blue-600" />
-          <h2 className="font-semibold text-gray-900">100 Aktivitas Terbaru</h2>
+        <div className="px-5 py-4 border-b border-gray-100 dark:border-slate-800 flex items-center gap-2">
+          <Activity className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+          <h2 className="font-semibold text-gray-900 dark:text-white">100 Aktivitas Terbaru</h2>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
@@ -70,13 +70,13 @@ export default async function AuditLogPage() {
                 <th className="table-th">Dokumen</th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-100">
+            <tbody className="bg-white dark:bg-slate-900 divide-y divide-gray-100 dark:divide-slate-800">
               {logs.map((log) => (
-                <tr key={log.id} className="hover:bg-gray-50">
-                  <td className="table-td whitespace-nowrap text-gray-400 text-xs">
+                <tr key={log.id} className="hover:bg-gray-50 dark:hover:bg-slate-800/50">
+                  <td className="table-td whitespace-nowrap text-gray-400 dark:text-slate-500 text-xs">
                     {format(new Date(log.createdAt), "dd MMM, HH:mm:ss", { locale: localeId })}
                   </td>
-                  <td className="table-td font-medium whitespace-nowrap">{log.user.name}</td>
+                  <td className="table-td font-medium whitespace-nowrap text-gray-900 dark:text-white">{log.user.name}</td>
                   <td className="table-td">
                     <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400 dark:text-slate-500">
                       {ROLE_LABELS[log.user.role as UserRole]}
@@ -104,7 +104,7 @@ export default async function AuditLogPage() {
             </tbody>
           </table>
           {logs.length === 0 && (
-            <p className="text-center py-8 text-sm text-gray-400">Belum ada aktivitas.</p>
+            <p className="text-center py-8 text-sm text-gray-400 dark:text-slate-500">Belum ada aktivitas.</p>
           )}
         </div>
       </div>

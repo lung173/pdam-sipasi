@@ -176,7 +176,17 @@ export function TopBar({ user, onMenuToggle }: Props) {
                     <Link
                       key={n.id}
                       href={n.link}
-                      onClick={() => setNotifOpen(false)}
+                      onClick={() => {
+                        // Dismiss from local state immediately
+                        setNotifications((prev) => prev.filter((item) => item.id !== n.id));
+                        setNotifOpen(false);
+                        // Persist dismiss to server (fire-and-forget)
+                        fetch("/api/notifications/dismiss", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ notifId: n.id }),
+                        }).catch(() => {});
+                      }}
                       className="flex gap-3 p-3 hover:bg-gray-50 dark:hover:bg-slate-700/50 rounded-xl transition-colors group mb-1"
                     >
                       <div className="mt-0.5">{getIcon(n.type)}</div>

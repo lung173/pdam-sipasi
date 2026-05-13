@@ -51,6 +51,7 @@ const navByRole: Record<UserRole, NavEntry[]> = {
         { label: "Peraturan Direktur", href: "/dashboard/admin/peraturan", icon: ScrollText },
       ],
     },
+    { label: "Pusat Dokumen", href: "/dashboard/admin/dokumen", icon: BookOpen },
     { label: "Arsip", href: "/dashboard/admin/arsip", icon: Archive },
     { label: "Kelola Pengguna", href: "/dashboard/admin/users", icon: Users },
     { label: "Audit Log", href: "/dashboard/admin/audit", icon: Activity },

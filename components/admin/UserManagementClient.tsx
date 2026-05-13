@@ -5,7 +5,7 @@ import { format } from "date-fns";
 import { id as localeId } from "date-fns/locale";
 import toast from "react-hot-toast";
 import {
-  Plus, Pencil, UserX, UserCheck, Loader2, X, Search,
+  Plus, Pencil, UserX, UserCheck, Loader2, X, Search, Eye, EyeOff,
 } from "lucide-react";
 import { ROLE_LABELS } from "@/types";
 import { UserRole } from "@prisma/client";
@@ -55,6 +55,7 @@ export function UserManagementClient({
     name: "", email: "", password: "", role: "ADMIN_STAFF", divisi: "",
   });
   const [errors, setErrors] = useState<Partial<FormState>>({});
+  const [showPassword, setShowPassword] = useState(false);
 
   const filtered = users.filter(
     (u) =>
@@ -271,7 +272,18 @@ export function UserManagementClient({
                 <label className="form-label">
                   Password {modal === "edit" && <span className="text-gray-400 dark:text-slate-500 font-normal">(kosongkan jika tidak diubah)</span>}
                 </label>
-                <input type="password" className="form-input" placeholder="Min. 8 karakter, huruf kapital + angka" value={form.password} onChange={setF("password")} />
+                <div className="relative">
+                  <input type={showPassword ? "text" : "password"} className="form-input pr-10" placeholder="Min. 8 karakter, huruf kapital + angka" value={form.password} onChange={setF("password")} />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((v) => !v)}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 rounded transition-colors"
+                    tabIndex={-1}
+                    title={showPassword ? "Sembunyikan password" : "Tampilkan password"}
+                  >
+                    {showPassword ? <EyeOff className="w-4.5 h-4.5" /> : <Eye className="w-4.5 h-4.5" />}
+                  </button>
+                </div>
                 {errors.password && <p className="form-error">{errors.password}</p>}
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">

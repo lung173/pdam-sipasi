@@ -138,6 +138,7 @@ model User {
   disposisiDari     LembarDisposisi[]  @relation("DisposisiDari")
   disposisiKe       LembarDisposisi[]  @relation("DisposisiKe")
   statusTimeline    StatusTimeline[]   @relation("TimelineChangedBy")
+  dismissedNotifs   DismissedNotification[]
 
   @@index([email])
   @@index([role])
@@ -430,4 +431,23 @@ model StatusTimeline {
 
   @@index([suratMasukId])
   @@map("status_timeline")
+}
+
+// ─────────────────────────────────────────────
+//  DISMISSED NOTIFICATIONS
+//  Melacak notifikasi yang sudah diklik/dibaca
+//  agar tidak muncul kembali.
+// ─────────────────────────────────────────────
+
+model DismissedNotification {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  notifKey  String   @map("notif_key") // e.g. "finish-clxyz123", "review-clxyz456"
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, notifKey])
+  @@index([userId])
+  @@map("dismissed_notifications")
 }
