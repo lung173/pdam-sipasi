@@ -111,6 +111,7 @@ model User {
   id           String   @id @default(cuid())
   name         String
   email        String   @unique
+  phoneNumber  String?  @map("phone_number")
   passwordHash String   @map("password_hash")
   role         UserRole
   divisi       String?
@@ -338,6 +339,7 @@ model Undangan {
   jam          String        // "08:00"
   tempat       String
   media        UndanganMedia @default(OFFLINE)
+  detailMedia  String?       @map("detail_media")
   dresscode    String?
   catatanLain  String?       @map("catatan_lain")
   deadline     DateTime      // Deadline kehadiran/konfirmasi

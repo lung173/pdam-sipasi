@@ -56,6 +56,16 @@ export async function POST(req: NextRequest, props: Params) {
         ipAddress: getClientIp(request),
       });
 
+      // Send Email & WA Notification
+      import("@/lib/notification-sender").then(({ notifyStaffAssigned }) => {
+        notifyStaffAssigned(
+          doc.id, 
+          [doc.createdById], 
+          user.name, 
+          "Mohon segera ambil dokumen fisik ke meja Agendaris dan tindaklanjuti hasil disposisinya."
+        ).catch(console.error);
+      });
+
       return successResponse(
         { document: updatedDoc },
         `Notifikasi pengambilan berhasil dikirim ke ${doc.createdBy.name}.`

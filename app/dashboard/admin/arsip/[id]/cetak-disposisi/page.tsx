@@ -61,6 +61,8 @@ export default async function CetakDisposisi(props: Params) {
         #print-area li { margin-bottom: 0.25rem; }
       `}} />
 
+
+
       <div id="print-area" style={{ border: '3px solid black', backgroundColor: 'white', color: 'black', fontSize: '14px', fontFamily: 'sans-serif' }}>
         {/* Header */}
         <div style={{ borderBottom: '3px solid black', padding: '16px', textAlign: 'center' }}>
@@ -89,12 +91,12 @@ export default async function CetakDisposisi(props: Params) {
         {/* Konten Bawah: Grid 2 Kolom Mentok Bawah */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', minHeight: '18cm' }}>
           
-          {/* Kolom Kiri: Disposisi Kepada + Tanggal/Catatan */}
+          {/* Kolom Kiri: Disposisi Kepada + Isi Instruksi/Catatan */}
           <div style={{ display: 'flex', flexDirection: 'column', borderRight: '3px solid black' }}>
             {/* Atas Kiri: Disposisi Kepada */}
             <div style={{ padding: '16px' }}>
-              <p style={{ fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '12px' }}>Disposisi Kepada :</p>
-              <div style={{ paddingLeft: '8px', fontWeight: 'bold', color: 'black', fontSize: '16px' }}>
+              <p style={{ fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '12px' }}>Disposisi Kepada :</p>
+              <div style={{ paddingLeft: '8px', color: 'black', fontSize: '16px' }}>
                 {latestDisposisi?.jabatanKe ? (
                   <ul>
                     {String(latestDisposisi.jabatanKe).split(",").map((j: string, i: number) => (
@@ -107,30 +109,30 @@ export default async function CetakDisposisi(props: Params) {
               </div>
             </div>
 
-            {/* Bawah Kiri: Tanggal Penyelesaian & Catatan */}
-            <div style={{ padding: '16px', borderTop: '3px solid black', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            {/* Bawah Kiri: Isi Instruksi & Catatan */}
+            <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div>
-                <p style={{ fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px' }}>Tanggal Penyelesaian :</p>
-                <p style={{ paddingLeft: '16px', fontWeight: 600, color: '#1d4ed8' }}>
-                  {latestDisposisi?.tanggalPenyelesaian || latestDisposisi?.tanggalTandaTangan
-                    ? format(new Date((latestDisposisi.tanggalPenyelesaian || latestDisposisi.tanggalTandaTangan) as Date), "dd MMMM yyyy", { locale: localeId })
-                    : "-"}
+                <p style={{ fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px', fontSize: '16px' }}>Isi Instruksi / Informasi :</p>
+                <p style={{ whiteSpace: 'pre-wrap', lineHeight: 1.6, fontSize: '16px', padding: '0 8px', fontWeight: 600, color: '#1d4ed8' }}>
+                  {latestDisposisi?.instruksi ?? "-"}
                 </p>
               </div>
               {latestDisposisi?.keterangan && (
                 <div>
-                  <p style={{ fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px' }}>Catatan :</p>
+                  <p style={{ fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px' }}>Catatan :</p>
                   <p style={{ paddingLeft: '16px', whiteSpace: 'pre-wrap', fontWeight: 600, color: '#1d4ed8' }}>{latestDisposisi.keterangan}</p>
                 </div>
               )}
             </div>
           </div>
 
-          {/* Kolom Kanan: Isi Instruksi */}
+          {/* Kolom Kanan: Tanggal Penyelesaian */}
           <div style={{ padding: '16px' }}>
-            <p style={{ fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '16px', fontSize: '16px' }}>Isi Instruksi / Informasi :</p>
-            <p style={{ whiteSpace: 'pre-wrap', lineHeight: 1.6, fontSize: '16px', padding: '0 8px', fontWeight: 600, color: '#1d4ed8' }}>
-              {latestDisposisi?.instruksi ?? "-"}
+            <p style={{ fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '16px', fontSize: '16px' }}>Tanggal Penyelesaian :</p>
+            <p style={{ paddingLeft: '16px', fontWeight: 600, color: '#1d4ed8', fontSize: '16px' }}>
+              {latestDisposisi?.tanggalPenyelesaian || latestDisposisi?.tanggalTandaTangan
+                ? format(new Date((latestDisposisi.tanggalPenyelesaian || latestDisposisi.tanggalTandaTangan) as Date), "dd MMMM yyyy", { locale: localeId })
+                : "-"}
             </p>
           </div>
         </div>

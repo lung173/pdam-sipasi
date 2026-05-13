@@ -121,7 +121,13 @@ export function TopBar({ user, onMenuToggle }: Props) {
           onSubmit={(e) => {
             e.preventDefault();
             const q = (e.currentTarget.elements.namedItem("q") as HTMLInputElement).value;
-            if (q) window.location.href = `/dashboard/search?q=${encodeURIComponent(q)}`;
+            if (q) {
+              if (user.role === "AGENDARIS") {
+                window.location.href = `/dashboard/admin/search?search=${encodeURIComponent(q)}`;
+              } else {
+                window.location.href = `/dashboard/search?q=${encodeURIComponent(q)}`;
+              }
+            }
           }}
           className="relative w-full group"
         >

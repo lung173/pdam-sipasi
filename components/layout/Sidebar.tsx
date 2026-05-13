@@ -7,7 +7,7 @@ import {
   FileText, LayoutDashboard, Users, ClipboardList,
   Archive, CheckSquare, BookOpen, LogOut, FileSearch, X, UserCog,
   Mail, MailOpen, Send, Briefcase, Award, Handshake, ScrollText,
-  Calendar, Activity, ChevronDown,
+  Calendar, Activity, ChevronDown, Search
 } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { UserRole } from "@prisma/client";

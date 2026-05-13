@@ -4,14 +4,17 @@ import { useState } from "react";
 import Link from "next/link";
 import { format } from "date-fns";
 import { id as localeId } from "date-fns/locale";
-import { ArrowLeft, FileText, Download, Calendar, User, Printer, Eye } from "lucide-react";
+import { ArrowLeft, FileText, Download, Calendar, User, Printer, Eye, Pencil, Trash2 } from "lucide-react";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { StatusTimeline } from "@/components/documents/StatusTimeline";
 import { AdminArchivePanel } from "@/components/documents/AdminArchivePanel";
 import { AgendarisActionPanel } from "@/components/documents/AgendarisActionPanel";
 import { FileListViewer } from "@/components/documents/FileListViewer";
+import { EditDokumenModal } from "@/components/documents/EditDokumenModal";
 import { DECISION_LABELS } from "@/types";
 import { DecisionType } from "@prisma/client";
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 export default function AdminArsipDetailClient({ doc, staffUsers }: { doc: any; staffUsers: any }) {
 
@@ -20,15 +23,51 @@ export default function AdminArsipDetailClient({ doc, staffUsers }: { doc: any; 
   const draftFiles = doc.files.filter((f: any) => f.fileType === "DRAFT");
   const scanFiles = doc.files.filter((f: any) => f.fileType === "FINAL_SCAN");
 
+  const router = useRouter();
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleDelete = async () => {
+    if (!confirm("Apakah Anda yakin ingin menghapus dokumen ini secara permanen? Aksi ini tidak dapat dibatalkan.")) return;
+    setIsDeleting(true);
+    try {
+      const res = await fetch(`/api/documents/${doc.id}`, { method: "DELETE" });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error ?? "Gagal menghapus dokumen");
+      toast.success("Dokumen berhasil dihapus!");
+      router.push("/dashboard/admin");
+    } catch (error: any) {
+      toast.error(error.message);
+      setIsDeleting(false);
+    }
+  };
+
   return (
     <div className="max-w-4xl mx-auto space-y-6">
-      <div className="flex items-center gap-3">
-        <Link href="/dashboard/admin/arsip" className="p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg">
-          <ArrowLeft className="w-5 h-5 text-gray-600 dark:text-slate-400" />
-        </Link>
-        <div>
-          <h1 className="page-title">Detail & Pengarsipan Dokumen</h1>
-          <p className="page-subtitle font-mono text-xs">{doc.nomorSurat}</p>
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <Link href="/dashboard/admin/arsip" className="p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg">
+            <ArrowLeft className="w-5 h-5 text-gray-600 dark:text-slate-400" />
+          </Link>
+          <div>
+            <h1 className="page-title">Detail & Pengarsipan Dokumen</h1>
+            <p className="page-subtitle font-mono text-xs">{doc.nomorSurat}</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setShowEditModal(true)}
+            className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 dark:bg-blue-900/30 dark:border-blue-800 dark:text-blue-300 dark:hover:bg-blue-900/50 transition-colors"
+          >
+            <Pencil className="w-4 h-4" /> Edit
+          </button>
+          <button
+            onClick={handleDelete}
+            disabled={isDeleting}
+            className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-red-700 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 dark:bg-red-900/30 dark:border-red-800 dark:text-red-300 dark:hover:bg-red-900/50 transition-colors"
+          >
+            <Trash2 className="w-4 h-4" /> {isDeleting ? "Menghapus..." : "Hapus"}
+          </button>
         </div>
       </div>
 
@@ -58,6 +97,51 @@ export default function AdminArsipDetailClient({ doc, staffUsers }: { doc: any; 
               </div>
             )}
           </div>
+
+          {/* Detail Kegiatan Undangan */}
+          {doc.documentType === "UNDANGAN" && doc.undangan && (
+            <div className="card p-5 bg-purple-50 dark:bg-purple-900/10 border-purple-200 dark:border-purple-800 space-y-4">
+              <h3 className="font-bold text-purple-900 dark:text-purple-200 text-sm uppercase tracking-wide flex items-center gap-2">
+                📋 Detail Kegiatan Undangan
+              </h3>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 text-sm">
+                <div>
+                  <span className="text-purple-600 dark:text-purple-400 font-medium text-xs block">Hari</span>
+                  <span className="text-gray-900 dark:text-white font-semibold">{doc.undangan.hari}</span>
+                </div>
+                <div>
+                  <span className="text-purple-600 dark:text-purple-400 font-medium text-xs block">Jam</span>
+                  <span className="text-gray-900 dark:text-white font-semibold">{doc.undangan.jam}</span>
+                </div>
+                <div>
+                  <span className="text-purple-600 dark:text-purple-400 font-medium text-xs block">Tanggal Kegiatan</span>
+                  <span className="text-gray-900 dark:text-white font-semibold">{format(new Date(doc.undangan.tanggal), "dd MMMM yyyy", { locale: localeId })}</span>
+                </div>
+                <div>
+                  <span className="text-purple-600 dark:text-purple-400 font-medium text-xs block">Tempat</span>
+                  <span className="text-gray-900 dark:text-white font-semibold">{doc.undangan.tempat}</span>
+                </div>
+                <div>
+                  <span className="text-purple-600 dark:text-purple-400 font-medium text-xs block">Media</span>
+                  <span className="text-gray-900 dark:text-white font-semibold">
+                    {doc.undangan.media === "ONLINE" 
+                      ? `Daring${doc.undangan.detailMedia ? ` (${doc.undangan.detailMedia})` : ""}` 
+                      : "Luring"}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-purple-600 dark:text-purple-400 font-medium text-xs block">Pakaian</span>
+                  <span className="text-gray-900 dark:text-white font-semibold">{doc.undangan.dresscode ?? "-"}</span>
+                </div>
+                {doc.undangan.catatanLain && (
+                  <div className="col-span-2 sm:col-span-3 mt-1 pt-3 border-t border-purple-200/60 dark:border-purple-800/60">
+                    <span className="text-purple-600 dark:text-purple-400 font-medium text-xs block mb-1">Catatan Tambahan</span>
+                    <span className="text-gray-900 dark:text-white font-medium text-sm whitespace-pre-wrap">{doc.undangan.catatanLain}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Keputusan Direktur */}
           {latestDecision && (
@@ -226,6 +310,10 @@ export default function AdminArsipDetailClient({ doc, staffUsers }: { doc: any; 
 
       {/* Spacing bottom */}
       <div className="h-10" />
+
+      {showEditModal && (
+        <EditDokumenModal doc={doc} onClose={() => setShowEditModal(false)} />
+      )}
     </div>
   );
 }

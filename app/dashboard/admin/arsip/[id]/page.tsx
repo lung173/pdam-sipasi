@@ -41,6 +41,7 @@ export default async function AdminArsipDetail(props: Params) {
           orderBy: { createdAt: "desc" },
           take: 1,
         },
+        undangan: true,
       },
     }),
     prisma.user.findMany({

@@ -35,7 +35,18 @@ export async function POST(req: NextRequest, props: Params) {
 
       // Validasi hak upload berdasarkan fileType & status
       if (fileType === "FINAL_SCAN") {
-        if (!["MENUNGGU_SCAN_FINAL", "KEPUTUSAN_DIREKTUR_SELESAI", "MENUNGGU_PENGAMBILAN_STAFF"].includes(doc.currentStatus)) {
+        const allowedFinalScanStatuses = [
+          "MENUNGGU_SCAN_FINAL",
+          "KEPUTUSAN_DIREKTUR_SELESAI",
+          "MENUNGGU_PENGAMBILAN_STAFF",
+        ];
+        
+        // Agendaris also allowed to upload final scan during initial creation
+        if (user.role === "AGENDARIS" && doc.currentStatus === "MENUNGGU_REVIEW_AGENDARIS") {
+          allowedFinalScanStatuses.push("MENUNGGU_REVIEW_AGENDARIS");
+        }
+
+        if (!allowedFinalScanStatuses.includes(doc.currentStatus)) {
           return errorResponse(
             "Upload scan final hanya diizinkan saat status: Menunggu Scan Final / Keputusan Selesai.",
             400
@@ -68,8 +79,8 @@ export async function POST(req: NextRequest, props: Params) {
         },
       });
 
-      // Jika final scan → ubah status ke MENUNGGU_ARSIP_ADMIN
-      if (fileType === "FINAL_SCAN") {
+      // Jika final scan → ubah status ke MENUNGGU_ARSIP_ADMIN (Kecuali jika ini adalah upload awal oleh Agendaris)
+      if (fileType === "FINAL_SCAN" && doc.currentStatus !== "MENUNGGU_REVIEW_AGENDARIS") {
         const prevStatus = doc.currentStatus;
         await prisma.suratMasuk.update({
           where: { id: doc.id },

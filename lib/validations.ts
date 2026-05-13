@@ -76,6 +76,7 @@ export const createUndanganSchema = z.object({
   jam: z.string().min(1, "Jam wajib diisi"),
   tempat: z.string().min(1, "Tempat wajib diisi"),
   media: z.enum(["ONLINE", "OFFLINE"]).default("OFFLINE"),
+  detailMedia: z.string().max(200).optional(),
   dresscode: z.string().max(100).optional(),
   catatanLain: z.string().max(1000).optional(),
   deadline: z.string().refine((d) => !isNaN(Date.parse(d)), {

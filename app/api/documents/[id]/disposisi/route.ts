@@ -86,6 +86,11 @@ export async function POST(req: NextRequest, props: Params) {
           ipAddress: getClientIp(request),
         });
 
+        // Send Email & WA Notification
+        import("@/lib/notification-sender").then(({ notifyDirekturNewDocument }) => {
+          notifyDirekturNewDocument(doc.id, user.name).catch(console.error);
+        });
+
         return successResponse(
           { id: doc.id },
           "Dokumen berhasil diteruskan ke Direktur. Direktur akan mengisi lembar disposisi."
