@@ -96,6 +96,12 @@ export async function POST(req: NextRequest) {
 
       const { nomorSurat: rawNomor, perihal, deskripsi, tujuan, asalSurat, tanggalSurat, documentType, category } = parsed.data;
 
+      // Extract undangan fields from raw body (not in createDocumentSchema)
+      const undanganData = body.undangan as {
+        hari?: string; jam?: string; tanggal?: string; tempat?: string;
+        media?: string; detailMedia?: string; dresscode?: string; catatanLain?: string; deadline?: string;
+      } | undefined;
+
       // Jika staff tidak mengisi nomor surat, auto-generate nomor draft sementara
       const today = new Date();
       const dateStr = today.toISOString().slice(0, 10).replace(/-/g, "");
@@ -134,6 +140,24 @@ export async function POST(req: NextRequest) {
         },
       });
 
+      // Jika UNDANGAN dan ada data undangan, buat record Undangan
+      if (documentType === "UNDANGAN" && undanganData?.hari && undanganData?.jam && undanganData?.tempat && undanganData?.tanggal) {
+        await prisma.undangan.create({
+          data: {
+            suratMasukId: doc.id,
+            hari: undanganData.hari,
+            jam: undanganData.jam,
+            tanggal: new Date(undanganData.tanggal),
+            tempat: undanganData.tempat,
+            media: (undanganData.media === "ONLINE" ? "ONLINE" : "OFFLINE"),
+            detailMedia: undanganData.detailMedia || null,
+            dresscode: undanganData.dresscode || null,
+            catatanLain: undanganData.catatanLain || null,
+            deadline: undanganData.deadline ? new Date(undanganData.deadline) : new Date(undanganData.tanggal),
+          },
+        });
+      }
+
       // Timeline & Audit
       await createStatusTimeline({
         suratMasukId: doc.id,
@@ -151,6 +175,14 @@ export async function POST(req: NextRequest) {
         metadata: { nomorSurat, perihal, documentType },
         ipAddress: getClientIp(request),
       });
+
+      // Notify Direktur if created by Agendaris
+      if (user.role === "AGENDARIS") {
+        import("@/lib/notification-sender").then(({ notifyDirekturNewDocument }) => {
+          // Fire and forget (don't await to avoid blocking response)
+          notifyDirekturNewDocument(doc.id, user.name).catch(console.error);
+        });
+      }
 
       return successResponse(doc, "Dokumen berhasil dibuat.", 201);
     } catch (error) {

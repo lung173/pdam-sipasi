@@ -2,35 +2,76 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { id as localeId } from "date-fns/locale";
-import { ArrowLeft, FileText, Download, Calendar, User, Printer, Eye } from "lucide-react";
+import { ArrowLeft, FileText, Download, Calendar, User, Printer, Eye, Pencil, Trash2 } from "lucide-react";
+import toast from "react-hot-toast";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { StatusTimeline } from "@/components/documents/StatusTimeline";
 import { AdminArchivePanel } from "@/components/documents/AdminArchivePanel";
 import { AgendarisActionPanel } from "@/components/documents/AgendarisActionPanel";
 import { FileListViewer } from "@/components/documents/FileListViewer";
-import { UndanganDetail } from "@/components/documents/UndanganDetail";
-import { DECISION_LABELS } from "@/types";
-import { DecisionType } from "@prisma/client";
 import { DisposisiViewer } from "@/components/documents/DisposisiViewer";
+import { EditDokumenModal } from "@/components/documents/EditDokumenModal";
+import { DECISION_LABELS, DocumentDetail } from "@/types";
+import { DecisionType } from "@prisma/client";
 
-export default function AdminArsipDetailClient({ doc, staffUsers }: { doc: any; staffUsers: any }) {
+export default function AdminArsipDetailClient({ doc, staffUsers }: { 
+  doc: DocumentDetail; 
+  staffUsers: { id: string; name: string; divisi: string | null }[]; 
+}) {
 
   const latestDecision = doc.decisions[0];
   const latestDisposisi = doc.disposisi?.[0] ?? null;
-  const draftFiles = doc.files.filter((f: any) => f.fileType === "DRAFT");
-  const scanFiles = doc.files.filter((f: any) => f.fileType === "FINAL_SCAN");
+  const draftFiles = doc.files.filter((f) => f.fileType === "DRAFT");
+  const scanFiles = doc.files.filter((f) => f.fileType === "FINAL_SCAN");
+
+  const router = useRouter();
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleDelete = async () => {
+    if (!confirm("Apakah Anda yakin ingin menghapus dokumen ini secara permanen? Aksi ini tidak dapat dibatalkan.")) return;
+    setIsDeleting(true);
+    try {
+      const res = await fetch(`/api/documents/${doc.id}`, { method: "DELETE" });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error ?? "Gagal menghapus dokumen");
+      toast.success("Dokumen berhasil dihapus!");
+      router.push("/dashboard/admin");
+    } catch (error: any) {
+      toast.error(error.message);
+      setIsDeleting(false);
+    }
+  };
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
-      <div className="flex items-center gap-3">
-        <Link href="/dashboard/admin/arsip" className="p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg">
-          <ArrowLeft className="w-5 h-5 text-gray-600 dark:text-slate-400" />
-        </Link>
-        <div>
-          <h1 className="page-title">Detail & Pengarsipan Dokumen</h1>
-          <p className="page-subtitle font-mono text-xs">{doc.nomorSurat}</p>
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <Link href="/dashboard/admin/arsip" className="p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg">
+            <ArrowLeft className="w-5 h-5 text-gray-600 dark:text-slate-400" />
+          </Link>
+          <div>
+            <h1 className="page-title">Detail & Pengarsipan Dokumen</h1>
+            <p className="page-subtitle font-mono text-xs">{doc.nomorSurat}</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setShowEditModal(true)}
+            className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 dark:bg-blue-900/30 dark:border-blue-800 dark:text-blue-300 dark:hover:bg-blue-900/50 transition-colors"
+          >
+            <Pencil className="w-4 h-4" /> Edit
+          </button>
+          <button
+            onClick={handleDelete}
+            disabled={isDeleting}
+            className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-red-700 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 dark:bg-red-900/30 dark:border-red-800 dark:text-red-300 dark:hover:bg-red-900/50 transition-colors"
+          >
+            <Trash2 className="w-4 h-4" /> {isDeleting ? "Menghapus..." : "Hapus"}
+          </button>
         </div>
       </div>
 
@@ -50,7 +91,7 @@ export default function AdminArsipDetailClient({ doc, staffUsers }: { doc: any; 
                 value={format(new Date(doc.tanggalSurat), "dd MMMM yyyy", { locale: localeId })} />
               <InfoRow icon={User} label="Pembuat"
                 value={`${doc.createdBy.name} (${doc.createdBy.divisi ?? "-"})`} />
-              <InfoRow icon={User} label="Email" value={doc.createdBy.email} />
+              <InfoRow icon={User} label="Email" value={doc.createdBy.email ?? "-"} />
             </div>
 
             {doc.deskripsi && (
@@ -60,10 +101,6 @@ export default function AdminArsipDetailClient({ doc, staffUsers }: { doc: any; 
               </div>
             )}
           </div>
-
-          {doc.documentType === "UNDANGAN" && doc.undangan && (
-            <UndanganDetail undangan={doc.undangan} perihal={doc.perihal} />
-          )}
 
           {/* Keputusan Direktur */}
           {latestDecision && (
@@ -159,6 +196,10 @@ export default function AdminArsipDetailClient({ doc, staffUsers }: { doc: any; 
 
       {/* Spacing bottom */}
       <div className="h-10" />
+
+      {showEditModal && (
+        <EditDokumenModal doc={doc} onClose={() => setShowEditModal(false)} />
+      )}
     </div>
   );
 }

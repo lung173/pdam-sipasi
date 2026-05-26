@@ -468,7 +468,8 @@ export function AgendarisActionPanel({
                     />
                   </FormEditRow>
                 </div>
-                {/* Row 4: Kategori Keperluan — satu per satu */}
+                {/* Row 4: Kategori Keperluan — hanya untuk Surat Masuk */}
+                {mode === "disposisi_masuk" && (
                 <div className="grid grid-cols-1 divide-gray-300">
                   <FormEditRow label="Kategori Keperluan">
                     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-1.5">
@@ -500,6 +501,7 @@ export function AgendarisActionPanel({
                     </div>
                   </FormEditRow>
                 </div>
+                )}
               </div>
 
               {/* Acara Undangan Details Form (Only for Undangan) */}

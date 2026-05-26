@@ -70,7 +70,8 @@ export async function PATCH(req: NextRequest, props: Params) {
       }
 
       const body = await request.json();
-      const parsed = updateDocumentSchema.safeParse(body);
+      const { undangan, ...restData } = body;
+      const parsed = updateDocumentSchema.safeParse(restData);
 
       if (!parsed.success) {
         return errorResponse("Validasi gagal.", 422);
@@ -85,6 +86,35 @@ export async function PATCH(req: NextRequest, props: Params) {
             : undefined,
         },
       });
+
+      if (undangan && doc.documentType === "UNDANGAN") {
+        await prisma.undangan.upsert({
+          where: { suratMasukId: doc.id },
+          create: {
+            suratMasukId: doc.id,
+            hari: undangan.hari,
+            jam: undangan.jam,
+            tanggal: new Date(undangan.tanggal),
+            tempat: undangan.tempat,
+            media: undangan.media,
+            detailMedia: undangan.detailMedia || null,
+            dresscode: undangan.dresscode || null,
+            catatanLain: undangan.catatanLain || null,
+            deadline: undangan.deadline ? new Date(undangan.deadline) : new Date(undangan.tanggal),
+          },
+          update: {
+            hari: undangan.hari,
+            jam: undangan.jam,
+            tanggal: new Date(undangan.tanggal),
+            tempat: undangan.tempat,
+            media: undangan.media,
+            detailMedia: undangan.detailMedia || null,
+            dresscode: undangan.dresscode || null,
+            catatanLain: undangan.catatanLain || null,
+            deadline: undangan.deadline ? new Date(undangan.deadline) : new Date(undangan.tanggal),
+          }
+        });
+      }
 
       await createAuditLog({
         userId: user.id,
@@ -115,9 +145,8 @@ export async function DELETE(req: NextRequest, props: Params) {
       const doc = await prisma.suratMasuk.findUnique({ where: { id: params.id } });
       if (!doc) return errorResponse("Dokumen tidak ditemukan.", 404);
 
-      if (doc.currentStatus !== "DRAFT") {
-        return errorResponse("Hanya dokumen berstatus DRAFT yang dapat dihapus.", 400);
-      }
+      // Allow Agendaris to delete documents at any stage if needed.
+      // (Optionally could restrict it, but admin needs flexibility)
 
       await prisma.suratMasuk.delete({ where: { id: params.id } });
 

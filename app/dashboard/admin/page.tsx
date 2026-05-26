@@ -12,7 +12,7 @@ import { ROLE_LABELS } from "@/types";
 import { UserRole, DocumentStatus } from "@prisma/client";
 import {
   FileText, Users, Archive, CheckCircle, Eye, ArrowRight,
-  Activity, Clock,
+  Activity, Clock, Plus,
 } from "lucide-react";
 
 export default async function AdminDashboard() {
@@ -56,6 +56,9 @@ export default async function AdminDashboard() {
           <p className="page-subtitle">Monitoring sistem dan pengelolaan arsip digital</p>
         </div>
         <div className="flex gap-2">
+          <Link href="/dashboard/admin/buat-surat" className="btn-primary bg-green-600 hover:bg-green-700">
+            <Plus className="w-4 h-4" /> Buat Surat Baru
+          </Link>
           <Link href="/dashboard/admin/users" className="btn-secondary">
             <Users className="w-4 h-4" /> Kelola User
           </Link>

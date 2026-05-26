@@ -160,7 +160,7 @@ export async function GET(req: NextRequest, props: Params) {
           dispPage.drawCircle({
             x: margin + 22,
             y: leftY + 3,
-            radius: 8,
+            size: 8,
             borderWidth: 1.5,
             borderColor: rgb(0.11, 0.3, 0.85),
             color: rgb(0.93, 0.96, 1.0),

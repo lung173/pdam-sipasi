@@ -37,7 +37,10 @@ export default async function AdminArsipDetail(props: Params) {
         },
         archive: { include: { archivedBy: { select: { name: true } } } },
         disposisi: {
-          include: { dari: { select: { name: true } } },
+          include: { 
+            dari: { select: { name: true } },
+            ke: { select: { name: true } },
+          },
           orderBy: { createdAt: "desc" },
           take: 1,
         },

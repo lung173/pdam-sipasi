@@ -164,8 +164,8 @@ export default async function CetakDisposisi(props: Params) {
             <div style={{ marginBottom: '24px' }}>
               <p style={{ fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '10px', fontSize: '13px' }}>Tanggal Penyelesaian</p>
               <div style={{ borderBottom: '1px dotted #555', paddingBottom: '4px', fontWeight: 'bold', fontSize: '14px', color: '#1d4ed8', minHeight: '24px' }}>
-                {latestDisposisi?.tanggalPenyelesaian
-                  ? format(new Date(latestDisposisi.tanggalPenyelesaian), "dd MMMM yyyy", { locale: localeId })
+                {latestDisposisi?.tanggalPenyelesaian || latestDisposisi?.tanggalTandaTangan
+                  ? format(new Date((latestDisposisi.tanggalPenyelesaian || latestDisposisi.tanggalTandaTangan) as Date), "dd MMMM yyyy", { locale: localeId })
                   : "-"}
               </div>
             </div>

@@ -3,7 +3,7 @@ import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAuth, successResponse, errorResponse, getClientIp } from "@/lib/auth-helpers";
 import { createAuditLog, createStatusTimeline } from "@/lib/audit";
-import type { DocumentStatus } from "@prisma/client";
+import { DocumentStatus, DocumentCategory } from "@prisma/client";
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -79,7 +79,7 @@ export async function POST(req: NextRequest, props: Params) {
             ...(nomorAgenda && { nomorAgenda }),
             ...(tanggalSurat && { tanggalSurat: new Date(tanggalSurat) }),
             ...(tanggalTerima && { tanggalTerima: new Date(tanggalTerima) }),
-            ...(category && { category }),
+            ...(category && { category: category as DocumentCategory }),
             ...(tanggalPenyelesaian && { tanggalPenyelesaian: new Date(tanggalPenyelesaian) }),
             ...(documentType && { documentType: documentType as any }),
           },
@@ -168,6 +168,11 @@ export async function POST(req: NextRequest, props: Params) {
           description: `Agendaris meneruskan dokumen ${doc.nomorSurat} ke Direktur`,
           metadata: { nomorSurat, perihal, asalSurat, nomorAgenda },
           ipAddress: getClientIp(request),
+        });
+
+        // Send Email & WA Notification
+        import("@/lib/notification-sender").then(({ notifyDirekturNewDocument }) => {
+          notifyDirekturNewDocument(doc.id, user.name).catch(console.error);
         });
 
         return successResponse(

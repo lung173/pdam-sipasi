@@ -7,7 +7,7 @@ import { createAuditLog, createStatusTimeline } from "@/lib/audit";
 type Params = { params: Promise<{ id: string }> };
 
 // POST /api/documents/[id]/submit
-// Staff mengirimkan dokumen ke Agendaris
+// Staff atau Agendaris mengirimkan dokumen ke tahap review
 export async function POST(req: NextRequest, props: Params) {
   const params = await props.params;
   return requireAuth(req, async (user, request) => {
@@ -22,7 +22,11 @@ export async function POST(req: NextRequest, props: Params) {
       });
 
       if (!doc) return errorResponse("Dokumen tidak ditemukan.", 404);
-      if (doc.createdById !== user.id) return errorResponse("Akses ditolak.", 403);
+
+      // Staff hanya bisa submit dokumen miliknya sendiri
+      if (user.role === "ADMIN_STAFF" && doc.createdById !== user.id) {
+        return errorResponse("Akses ditolak.", 403);
+      }
 
       const allowedStatuses = ["DRAFT", "PERLU_REVISI"];
       if (user.role === "AGENDARIS") {
@@ -57,7 +61,7 @@ export async function POST(req: NextRequest, props: Params) {
         toStatus: "MENUNGGU_REVIEW_AGENDARIS",
         changedBy: user.id,
         notes: user.role === "AGENDARIS"
-          ? "Dokumen siap diproses oleh Agendaris"
+          ? "Dokumen dibuat dan diproses oleh Agendaris"
           : "Dokumen dikirim ke Agendaris untuk review",
       });
 

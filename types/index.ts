@@ -17,9 +17,10 @@ import {
   DocumentType,
   UndanganType,
   DocumentCategory,
+  UndanganMedia,
 } from "@prisma/client";
 
-export type { UserRole, DocumentStatus, DecisionType, FileType, ReviewStatus, DocumentType, UndanganType, DocumentCategory };
+export type { UserRole, DocumentStatus, DecisionType, FileType, ReviewStatus, DocumentType, UndanganType, DocumentCategory, UndanganMedia };
 
 // ─────────────────────────────────────────────
 //  USER TYPES
@@ -58,12 +59,13 @@ export interface DocumentListItem {
     id: string;
     name: string;
     divisi: string | null;
+    email?: string | null;
   };
 }
 
 export interface DocumentDetail extends DocumentListItem {
   deskripsi?: string | null;
-  nomorAgenda?: string | null;
+  nomorAgenda: string | null;
   tanggalTerima: Date | string;
   tanggalInstruksi?: Date | string | null;
   tanggalPenyelesaian?: Date | string | null;
@@ -125,6 +127,7 @@ export interface ArchiveItem {
   archivedBy: { name: string };
   bulan: number;
   tahun: number;
+  notes?: string | null;
 }
 
 export interface JadwalItem {
@@ -156,13 +159,24 @@ export interface UndanganItem {
   tanggal: Date | string;
   jam: string;
   tempat: string;
-  media: string;
+  media: UndanganMedia;
   dresscode: string | null;
   catatanLain: string | null;
   deadline: Date | string;
   undanganType: UndanganType;
   pengirimExternal: string | null;
   kontakExternal: string | null;
+  penerima: {
+    id: string;
+    undanganId: string;
+    userId: string;
+    sudahBaca: boolean;
+    user: {
+      id: string;
+      name: string;
+      divisi: string | null;
+    };
+  }[];
 }
 
 // ─────────────────────────────────────────────
