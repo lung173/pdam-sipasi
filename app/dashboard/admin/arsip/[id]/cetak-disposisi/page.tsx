@@ -37,7 +37,30 @@ export default async function CetakDisposisi(props: Params) {
   };
   
   const senderRole = latestDisposisi?.dari?.role ? ROLE_LABELS[latestDisposisi.dari.role] : "Direktur Utama";
-  const senderName = latestDisposisi?.dari?.name ?? "DIREKTUR UTAMA";
+
+  const isMatched = (item: string) => {
+    if (!latestDisposisi?.jabatanKe) return false;
+    const selected = latestDisposisi.jabatanKe.toLowerCase();
+    const cleanItem = item.toLowerCase();
+    
+    if (cleanItem.includes("adum") && (selected.includes("adum") || selected.includes("keuangan") || selected.includes("administrasi"))) return true;
+    if (cleanItem.includes("teknik") && selected.includes("teknik")) return true;
+    if (cleanItem.includes("hublang") && (selected.includes("hublang") || selected.includes("hubungan langganan"))) return true;
+    if (cleanItem.includes("spi") && selected.includes("spi")) return true;
+    if (cleanItem.includes("utara") && selected.includes("utara")) return true;
+    if (cleanItem.includes("selatan") && selected.includes("selatan")) return true;
+    
+    return selected.includes(cleanItem);
+  };
+
+  const standardItems = [
+    "Kabag Adum dan Keu",
+    "Kabag Teknik",
+    "Kabag Hublang",
+    "Kepala SPI",
+    "Kacab. Utara",
+    "Kacab. Selatan",
+  ];
 
   return (
     <div className="p-8 max-w-[21cm] mx-auto bg-white min-h-[29.7cm] text-black relative">
@@ -56,82 +79,112 @@ export default async function CetakDisposisi(props: Params) {
         __html: `
         @page { size: A4; margin: 0; }
         body { margin: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-        #print-area * { border-style: none; box-sizing: border-box; }
-        #print-area ul { list-style-type: decimal; padding-left: 1.5rem; margin: 0; }
-        #print-area li { margin-bottom: 0.25rem; }
+        #print-area * { box-sizing: border-box; }
       `}} />
 
-      <div id="print-area" style={{ border: '3px solid black', backgroundColor: 'white', color: 'black', fontSize: '14px', fontFamily: 'sans-serif' }}>
+      <div id="print-area" style={{ border: '4px solid black', backgroundColor: 'white', color: 'black', fontFamily: 'Arial, sans-serif', width: '100%' }}>
         {/* Header */}
-        <div style={{ borderBottom: '3px solid black', padding: '16px', textAlign: 'center' }}>
-          <h1 style={{ fontSize: '1.125rem', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.1em', margin: '0 0 4px 0' }}>
+        <div style={{ borderBottom: '4px solid black', padding: '20px 16px', textAlign: 'center' }}>
+          <h1 style={{ fontSize: '15px', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.05em', margin: '0 0 6px 0', lineHeight: 1.3 }}>
             PERUSAHAAN UMUM DAERAH AIR MINUM TIRTA MAKMUR KABUPATEN SUKOHARJO
           </h1>
-          <h2 style={{ fontSize: '1.25rem', fontWeight: 900, marginTop: '8px', letterSpacing: '0.2em', textDecoration: 'underline', textUnderlineOffset: '4px' }}>
+          <h2 style={{ fontSize: '18px', fontWeight: 'bold', marginTop: '10px', letterSpacing: '2px', textTransform: 'uppercase' }}>
             {doc.documentType === "UNDANGAN" ? "LEMBAR DISPOSISI SURAT UNDANGAN" : "LEMBAR DISPOSISI SURAT MASUK"}
           </h2>
         </div>
 
-        {/* Info rows */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', borderBottom: '3px solid black' }}>
-          <div style={{ borderRight: '3px solid black', display: 'flex', flexDirection: 'column' }}>
-            <PrintRow label="Tanggal Surat" value={format(new Date(doc.tanggalSurat), "dd MMMM yyyy", { locale: localeId })} borderBottom />
-            <PrintRow label="Asal Surat" value={doc.asalSurat ?? "-"} borderBottom />
-            <PrintRow label="Perihal" value={doc.perihal} />
+        {/* Info rows (Simplified: No vertical and no horizontal separator lines) */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', borderBottom: '4px solid black', padding: '10px 0' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            <PrintField label="Tanggal Surat" value={format(new Date(doc.tanggalSurat), "dd MMMM yyyy", { locale: localeId })} />
+            <PrintField label="Asal Surat" value={doc.asalSurat ?? "-"} />
+            <PrintField label="Perihal" value={doc.perihal} />
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <PrintRow label="Tanggal Terima" value={format(new Date(doc.tanggalTerima), "dd MMMM yyyy", { locale: localeId })} borderBottom />
-            <PrintRow label="No. Agenda" value={doc.nomorAgenda ?? "-"} borderBottom />
-            <PrintRow label="Nomor Surat" value={doc.nomorSurat} />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            <PrintField label="Tanggal Terima" value={format(new Date(doc.tanggalTerima), "dd MMMM yyyy", { locale: localeId })} />
+            <PrintField label="Agenda" value={doc.nomorAgenda ?? "-"} />
+            <PrintField label="Nomor Surat" value={doc.nomorSurat} />
           </div>
         </div>
 
-        {/* Konten Bawah: Grid 2 Kolom Mentok Bawah */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', minHeight: '18cm' }}>
-          
-          {/* Kolom Kiri: Disposisi Kepada + Tanggal/Catatan */}
-          <div style={{ display: 'flex', flexDirection: 'column', borderRight: '3px solid black' }}>
-            {/* Atas Kiri: Disposisi Kepada */}
-            <div style={{ padding: '16px' }}>
-              <p style={{ fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '12px' }}>Disposisi Kepada :</p>
-              <div style={{ paddingLeft: '8px', fontWeight: 'bold', color: 'black', fontSize: '16px' }}>
-                {latestDisposisi?.jabatanKe ? (
-                  <ul>
-                    {String(latestDisposisi.jabatanKe).split(",").map((j: string, i: number) => (
-                      <li key={i}>{j.trim()}</li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p>-</p>
-                )}
-              </div>
-            </div>
-
-            {/* Bawah Kiri: Tanggal Penyelesaian & Catatan */}
-            <div style={{ padding: '16px', borderTop: '3px solid black', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        {/* Bottom Section */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', minHeight: '16cm' }}>
+          {/* Kolom Kiri: Disposisi Kepada + Isi Instruksi (Merged without separator line) */}
+          <div style={{ display: 'flex', flexDirection: 'column', borderRight: '3px solid black', padding: '20px', justifyContent: 'space-between' }}>
+            <div>
+              {/* Disposisi Kepada */}
               <div>
-                <p style={{ fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px' }}>Tanggal Penyelesaian :</p>
-                <p style={{ paddingLeft: '16px', fontWeight: 600, color: '#1d4ed8' }}>
-                  {latestDisposisi?.tanggalPenyelesaian || latestDisposisi?.tanggalTandaTangan
-                    ? format(new Date((latestDisposisi.tanggalPenyelesaian || latestDisposisi.tanggalTandaTangan) as Date), "dd MMMM yyyy", { locale: localeId })
-                    : "-"}
+                <p style={{ fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '16px', fontSize: '13px' }}>Disposisi Kepada :</p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '14px', marginBottom: '24px' }}>
+                  {standardItems.map((item, index) => {
+                    const num = index + 1;
+                    const active = isMatched(item);
+                    return (
+                      <div key={item} style={{ display: 'flex', alignItems: 'center', fontWeight: active ? 'bold' : 'normal' }}>
+                        <span style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          width: '24px',
+                          height: '24px',
+                          borderRadius: '50%',
+                          border: active ? '2px solid #1d4ed8' : '2px solid transparent',
+                          color: active ? '#1d4ed8' : '#000',
+                          fontWeight: 'bold',
+                          marginRight: '8px',
+                          fontSize: '13px',
+                          backgroundColor: active ? '#eff6ff' : 'transparent',
+                        }}>
+                          {num}
+                        </span>
+                        <span style={{ color: active ? '#1d4ed8' : '#000' }}>
+                          {item}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Isi Instruksi */}
+              <div>
+                <p style={{ fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '14px', fontSize: '13px' }}>Isi Instruksi/Informasi :</p>
+                <p style={{ whiteSpace: 'pre-wrap', lineHeight: 1.6, fontSize: '16px', fontWeight: 'bold', color: '#1d4ed8', padding: '0 4px' }}>
+                  {latestDisposisi?.instruksi ?? "-"}
                 </p>
               </div>
-              {latestDisposisi?.keterangan && (
-                <div>
-                  <p style={{ fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px' }}>Catatan :</p>
-                  <p style={{ paddingLeft: '16px', whiteSpace: 'pre-wrap', fontWeight: 600, color: '#1d4ed8' }}>{latestDisposisi.keterangan}</p>
-                </div>
-              )}
             </div>
+
+            {/* Signature block hidden per request */}
           </div>
 
-          {/* Kolom Kanan: Isi Instruksi */}
-          <div style={{ padding: '16px' }}>
-            <p style={{ fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '16px', fontSize: '16px' }}>Isi Instruksi / Informasi :</p>
-            <p style={{ whiteSpace: 'pre-wrap', lineHeight: 1.6, fontSize: '16px', padding: '0 8px', fontWeight: 600, color: '#1d4ed8' }}>
-              {latestDisposisi?.instruksi ?? "-"}
-            </p>
+          {/* Kolom Kanan: Tanggal Penyelesaian + Catatan (Merged without separator line and no "CATATAN:" label) */}
+          <div style={{ display: 'flex', flexDirection: 'column', padding: '20px' }}>
+            {/* Top: Tanggal Penyelesaian */}
+            <div style={{ marginBottom: '24px' }}>
+              <p style={{ fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '10px', fontSize: '13px' }}>Tanggal Penyelesaian</p>
+              <div style={{ borderBottom: '1px dotted #555', paddingBottom: '4px', fontWeight: 'bold', fontSize: '14px', color: '#1d4ed8', minHeight: '24px' }}>
+                {latestDisposisi?.tanggalPenyelesaian
+                  ? format(new Date(latestDisposisi.tanggalPenyelesaian), "dd MMMM yyyy", { locale: localeId })
+                  : "-"}
+              </div>
+            </div>
+
+            {/* Bottom: Catatan value & Guidelines */}
+            <div style={{ flexGrow: 1 }}>
+              {latestDisposisi?.keterangan ? (
+                <p style={{ whiteSpace: 'pre-wrap', fontSize: '14px', color: '#1d4ed8', fontWeight: 'bold', borderBottom: '1px dotted #555', paddingBottom: '8px', marginBottom: '12px' }}>
+                  {latestDisposisi.keterangan}
+                </p>
+              ) : null}
+
+              {/* Dotted lines filling */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                {Array.from({ length: latestDisposisi?.keterangan ? 5 : 7 }).map((_, i) => (
+                  <div key={i} style={{ borderBottom: '1px dotted #555', height: '10px' }} />
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -139,12 +192,18 @@ export default async function CetakDisposisi(props: Params) {
   );
 }
 
-function PrintRow({ label, value, borderBottom }: { label: string; value: string; borderBottom?: boolean }) {
+function PrintField({ label, value }: { label: string; value: string }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'flex-start', padding: '12px 16px', borderBottom: borderBottom ? '3px solid black' : 'none' }}>
-      <span style={{ fontWeight: 'bold', flexShrink: 0, width: '144px' }}>{label}</span>
-      <span style={{ fontWeight: 'bold', flexShrink: 0, margin: '0 8px' }}>:</span>
-      <span style={{ wordBreak: 'break-all' }}>{value}</span>
+    <div style={{
+      padding: '8px 16px',
+      display: 'flex',
+      alignItems: 'flex-start',
+    }}>
+      <span style={{ fontWeight: 'bold', width: '120px', flexShrink: 0, fontSize: '13px', textTransform: 'uppercase', letterSpacing: '0.02em', color: '#374151' }}>{label}</span>
+      <span style={{ fontWeight: 'bold', margin: '0 8px', flexShrink: 0, fontSize: '13px', color: '#374151' }}>:</span>
+      <span style={{ wordBreak: 'break-all', fontWeight: 'bold', fontSize: '14px', color: '#1d4ed8' }}>
+        {value || "-"}
+      </span>
     </div>
   );
 }

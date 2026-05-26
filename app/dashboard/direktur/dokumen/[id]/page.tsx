@@ -14,6 +14,7 @@ import { DirectorDisposisiPanel } from "@/components/documents/DirectorDisposisi
 import { FileListViewer } from "@/components/documents/FileListViewer";
 import { DECISION_LABELS } from "@/types";
 import { DecisionType } from "@prisma/client";
+import { UndanganDetail } from "@/components/documents/UndanganDetail";
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -47,6 +48,17 @@ export default async function DirektuurDocumentDetail(props: Params) {
       disposisi: {
         orderBy: { createdAt: "desc" },
         take: 1,
+      },
+      undangan: {
+        include: {
+          penerima: {
+            include: {
+              user: {
+                select: { id: true, name: true, divisi: true }
+              }
+            }
+          }
+        }
       },
     },
   });
@@ -112,6 +124,10 @@ export default async function DirektuurDocumentDetail(props: Params) {
               </div>
             )}
           </div>
+
+          {doc.documentType === "UNDANGAN" && doc.undangan && (
+            <UndanganDetail undangan={doc.undangan as any} perihal={doc.perihal} />
+          )}
 
           {/* Files */}
           <FileListViewer 

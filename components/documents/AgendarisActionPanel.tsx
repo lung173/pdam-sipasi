@@ -18,6 +18,20 @@ interface DocProps {
   asalSurat?: string | null;
   nomorAgenda?: string | null;
   category?: string;
+  undangan?: {
+    hari: string;
+    tanggal: Date | string;
+    deadline: Date | string;
+    jam: string;
+    tempat: string;
+    media: "ONLINE" | "OFFLINE";
+    dresscode: string | null;
+    catatanLain: string | null;
+    undanganType: "INTERNAL" | "EXTERNAL";
+    pengirimExternal: string | null;
+    kontakExternal: string | null;
+    penerima: { userId: string }[];
+  } | null;
 }
 
 type Mode = "idle" | "teruskan" | "kembalikan" | "disposisi_masuk" | "disposisi_undangan";
@@ -71,6 +85,22 @@ export function AgendarisActionPanel({
   const [editCategory, setEditCategory] = useState(doc.category ?? "DLL");
   const [editTanggalPenyelesaian, setEditTanggalPenyelesaian] = useState("");
 
+  // States for Undangan
+  const [uHari, setUHari] = useState(doc.undangan?.hari ?? "");
+  const [uTanggalMulai, setUTanggalMulai] = useState(toDateInput(doc.undangan?.tanggal));
+  const [uTanggalSelesai, setUTanggalSelesai] = useState(toDateInput(doc.undangan?.deadline));
+  const [uJam, setUJam] = useState(doc.undangan?.jam ?? "");
+  const [uTempat, setUTempat] = useState(doc.undangan?.tempat ?? "");
+  const [uMedia, setUMedia] = useState<"ONLINE" | "OFFLINE">(doc.undangan?.media ?? "OFFLINE");
+  const [uDresscode, setUDresscode] = useState(doc.undangan?.dresscode ?? "");
+  const [uCatatanLain, setUCatatanLain] = useState(doc.undangan?.catatanLain ?? "");
+  const [uUndanganType, setUUndanganType] = useState<"INTERNAL" | "EXTERNAL">(doc.undangan?.undanganType ?? "INTERNAL");
+  const [uPengirimExternal, setUPengirimExternal] = useState(doc.undangan?.pengirimExternal ?? "");
+  const [uKontakExternal, setUKontakExternal] = useState(doc.undangan?.kontakExternal ?? "");
+  const [uPenerimaIds, setUPenerimaIds] = useState<string[]>(
+    doc.undangan?.penerima?.map((p) => p.userId) ?? []
+  );
+
   const reset = () => {
     setMode("idle");
     setReviewNote(""); setRevisiNote("");
@@ -82,6 +112,20 @@ export function AgendarisActionPanel({
     setEditAsalSurat(doc.asalSurat ?? "");
     setEditNomorAgenda(doc.nomorAgenda ?? "");
     setEditTanggalPenyelesaian("");
+    
+    // Undangan reset
+    setUHari(doc.undangan?.hari ?? "");
+    setUTanggalMulai(toDateInput(doc.undangan?.tanggal));
+    setUTanggalSelesai(toDateInput(doc.undangan?.deadline));
+    setUJam(doc.undangan?.jam ?? "");
+    setUTempat(doc.undangan?.tempat ?? "");
+    setUMedia(doc.undangan?.media ?? "OFFLINE");
+    setUDresscode(doc.undangan?.dresscode ?? "");
+    setUCatatanLain(doc.undangan?.catatanLain ?? "");
+    setUUndanganType(doc.undangan?.undanganType ?? "INTERNAL");
+    setUPengirimExternal(doc.undangan?.pengirimExternal ?? "");
+    setUKontakExternal(doc.undangan?.kontakExternal ?? "");
+    setUPenerimaIds(doc.undangan?.penerima?.map((p) => p.userId) ?? []);
   };
 
   const submitTeruskan = async () => {
@@ -126,6 +170,13 @@ export function AgendarisActionPanel({
   };
 
   const submitDisposisi = async () => {
+    if (mode === "disposisi_undangan") {
+      if (!uHari || !uTanggalMulai || !uTanggalSelesai || !uJam || !uTempat) {
+        toast.error("Harap isi semua kolom wajib acara undangan (Hari, Tanggal Mulai/Selesai, Jam, Tempat).");
+        return;
+      }
+    }
+
     setLoading(true);
     try {
       const res = await fetch(`/api/documents/${doc.id}/disposisi`, {
@@ -142,6 +193,22 @@ export function AgendarisActionPanel({
           category: editCategory,
           tanggalPenyelesaian: editTanggalPenyelesaian || undefined,
           documentType: mode === "disposisi_undangan" ? "UNDANGAN" : "SURAT_MASUK",
+          ...(mode === "disposisi_undangan" && {
+            undangan: {
+              hari: uHari,
+              tanggalMulai: uTanggalMulai,
+              tanggalSelesai: uTanggalSelesai,
+              jam: uJam,
+              tempat: uTempat,
+              media: uMedia,
+              dresscode: uDresscode || null,
+              catatanLain: uCatatanLain || null,
+              undanganType: uUndanganType,
+              pengirimExternal: uUndanganType === "EXTERNAL" ? uPengirimExternal : null,
+              kontakExternal: uUndanganType === "EXTERNAL" ? uKontakExternal : null,
+              penerimaIds: uPenerimaIds,
+            }
+          })
         }),
       });
       const json = await res.json();
@@ -435,8 +502,185 @@ export function AgendarisActionPanel({
                 </div>
               </div>
 
+              {/* Acara Undangan Details Form (Only for Undangan) */}
+              {mode === "disposisi_undangan" && (
+                <div className="bg-purple-50/50 dark:bg-purple-950/10 p-4 border-b-2 border-gray-400 dark:border-slate-700 space-y-4 text-xs">
+                  <h4 className="font-bold text-purple-950 dark:text-purple-300 text-xs flex items-center gap-1.5 uppercase tracking-wider">
+                    <span>📅</span> Form Acara Undangan
+                  </h4>
+                  
+                  {/* Hari, Jam & Media */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div>
+                      <label className="block text-[10px] font-bold text-gray-700 dark:text-slate-400 uppercase mb-1">Hari</label>
+                      <input
+                        className="form-input text-xs py-1"
+                        placeholder="Contoh: Senin"
+                        value={uHari}
+                        onChange={(e) => setUHari(e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-bold text-gray-700 dark:text-slate-400 uppercase mb-1">Jam Acara</label>
+                      <input
+                        className="form-input text-xs py-1 font-mono"
+                        placeholder="Contoh: 09:00"
+                        value={uJam}
+                        onChange={(e) => setUJam(e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-bold text-gray-700 dark:text-slate-400 uppercase mb-1">Media</label>
+                      <select
+                        className="form-input text-xs py-1"
+                        value={uMedia}
+                        onChange={(e) => setUMedia(e.target.value as any)}
+                      >
+                        <option value="OFFLINE">OFFLINE (📍)</option>
+                        <option value="ONLINE">ONLINE (🎥)</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Tanggal Mulai & Tanggal Selesai */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-[10px] font-bold text-gray-700 dark:text-slate-400 uppercase mb-1">Tanggal Mulai (Start Date)</label>
+                      <input
+                        type="date"
+                        className="form-input text-xs py-1"
+                        value={uTanggalMulai}
+                        onChange={(e) => setUTanggalMulai(e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-bold text-gray-700 dark:text-slate-400 uppercase mb-1">Tanggal Selesai (End Date)</label>
+                      <input
+                        type="date"
+                        className="form-input text-xs py-1"
+                        value={uTanggalSelesai}
+                        onChange={(e) => setUTanggalSelesai(e.target.value)}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Tempat & Dresscode */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-[10px] font-bold text-gray-700 dark:text-slate-400 uppercase mb-1">Tempat / Ruangan</label>
+                      <input
+                        className="form-input text-xs py-1"
+                        placeholder="Contoh: Ruang Rapat Utama"
+                        value={uTempat}
+                        onChange={(e) => setUTempat(e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-bold text-gray-700 dark:text-slate-400 uppercase mb-1">Dresscode</label>
+                      <input
+                        className="form-input text-xs py-1"
+                        placeholder="Contoh: Batik Sukoharjo"
+                        value={uDresscode}
+                        onChange={(e) => setUDresscode(e.target.value)}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Tipe Undangan */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div>
+                      <label className="block text-[10px] font-bold text-gray-700 dark:text-slate-400 uppercase mb-1">Tipe Undangan</label>
+                      <div className="flex gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setUUndanganType("INTERNAL")}
+                          className={`flex-1 py-1 rounded border text-[10px] font-bold uppercase transition-all
+                            ${uUndanganType === "INTERNAL" ? "bg-purple-100 dark:bg-purple-900/50 border-purple-500 text-purple-800 dark:text-purple-300" : "bg-white dark:bg-slate-800 text-gray-600 dark:text-slate-400"}`}
+                        >
+                          Internal
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setUUndanganType("EXTERNAL")}
+                          className={`flex-1 py-1 rounded border text-[10px] font-bold uppercase transition-all
+                            ${uUndanganType === "EXTERNAL" ? "bg-purple-100 dark:bg-purple-900/50 border-purple-500 text-purple-800 dark:text-purple-300" : "bg-white dark:bg-slate-800 text-gray-600 dark:text-slate-400"}`}
+                        >
+                          Eksternal
+                        </button>
+                      </div>
+                    </div>
+                    
+                    {uUndanganType === "EXTERNAL" && (
+                      <>
+                        <div>
+                          <label className="block text-[10px] font-bold text-gray-700 dark:text-slate-400 uppercase mb-1">Instansi Pengirim</label>
+                          <input
+                            className="form-input text-xs py-1"
+                            placeholder="Nama instansi..."
+                            value={uPengirimExternal}
+                            onChange={(e) => setUPengirimExternal(e.target.value)}
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[10px] font-bold text-gray-700 dark:text-slate-400 uppercase mb-1">No. Kontak Pengirim</label>
+                          <input
+                            className="form-input text-xs py-1"
+                            placeholder="Nomor WA/Telp..."
+                            value={uKontakExternal}
+                            onChange={(e) => setUKontakExternal(e.target.value)}
+                          />
+                        </div>
+                      </>
+                    )}
+                  </div>
+
+                  {/* Penerima Undangan (Internal Staff Checklist) */}
+                  <div>
+                    <label className="block text-[10px] font-bold text-gray-700 dark:text-slate-400 uppercase mb-1.5 flex items-center gap-1">
+                      <span>👥</span> Pilih Penerima Undangan Internal
+                    </label>
+                    <div className="grid grid-cols-2 gap-1.5 bg-white dark:bg-slate-800 p-2 rounded border max-h-[8.5rem] overflow-y-auto">
+                      {staffUsers.map((s) => (
+                        <label
+                          key={s.id}
+                          className="flex items-center gap-2 px-2 py-1 rounded hover:bg-purple-50 dark:hover:bg-purple-950/20 cursor-pointer transition-colors"
+                        >
+                          <input
+                            type="checkbox"
+                            className="accent-purple-600"
+                            checked={uPenerimaIds.includes(s.id)}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setUPenerimaIds([...uPenerimaIds, s.id]);
+                              } else {
+                                setUPenerimaIds(uPenerimaIds.filter((id) => id !== s.id));
+                              }
+                            }}
+                          />
+                          <span className="text-[10px] font-medium text-gray-700 dark:text-slate-300 truncate">
+                            {s.name} <span className="text-gray-400">({s.divisi || "-"})</span>
+                          </span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Catatan Lain */}
+                  <div>
+                    <label className="block text-[10px] font-bold text-gray-700 dark:text-slate-400 uppercase mb-1">Catatan Tambahan</label>
+                    <textarea
+                      className="form-input text-xs py-1 resize-none"
+                      rows={2}
+                      placeholder="Info/catatan tambahan acara..."
+                      value={uCatatanLain}
+                      onChange={(e) => setUCatatanLain(e.target.value)}
+                    />
+                  </div>
+                </div>
+              )}
+
               {/* Disposisi Kepada + Tanggal Penyelesaian & Catatan — READ-ONLY untuk Agendaris */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-gray-300 border-b-2 border-gray-400">
+              <div className="grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-gray-300 border-b-2 border-gray-400 dark:border-slate-700">
                 {/* Left: Disposisi Kepada — diisi Direktur */}
                 <div className="p-3">
                   <p className="font-bold text-gray-800 mb-2 text-xs uppercase tracking-wide">

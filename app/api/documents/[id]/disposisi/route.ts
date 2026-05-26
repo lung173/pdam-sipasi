@@ -32,7 +32,7 @@ export async function POST(req: NextRequest, props: Params) {
       // ── AGENDARIS: Teruskan dokumen ke Direktur (update metadata saja) ──
       if (user.role === "AGENDARIS") {
         const {
-          nomorSurat, perihal, asalSurat, nomorAgenda, tanggalSurat, tanggalTerima, documentType
+          nomorSurat, perihal, asalSurat, nomorAgenda, tanggalSurat, tanggalTerima, documentType, category, tanggalPenyelesaian, undangan
         } = body as {
           nomorSurat?: string;
           perihal?: string;
@@ -41,7 +41,22 @@ export async function POST(req: NextRequest, props: Params) {
           tanggalSurat?: string;
           tanggalTerima?: string;
           category?: string;
+          tanggalPenyelesaian?: string;
           documentType?: string;
+          undangan?: {
+            hari: string;
+            tanggalMulai: string;
+            tanggalSelesai: string;
+            jam: string;
+            tempat: string;
+            media?: "ONLINE" | "OFFLINE";
+            dresscode?: string;
+            catatanLain?: string;
+            undanganType?: "INTERNAL" | "EXTERNAL";
+            pengirimExternal?: string;
+            kontakExternal?: string;
+            penerimaIds?: string[];
+          };
         };
 
         const doc = await prisma.suratMasuk.findUnique({ where: { id: params.id } });
@@ -64,10 +79,79 @@ export async function POST(req: NextRequest, props: Params) {
             ...(nomorAgenda && { nomorAgenda }),
             ...(tanggalSurat && { tanggalSurat: new Date(tanggalSurat) }),
             ...(tanggalTerima && { tanggalTerima: new Date(tanggalTerima) }),
-            ...(body.category && { category: body.category }),
+            ...(category && { category }),
+            ...(tanggalPenyelesaian && { tanggalPenyelesaian: new Date(tanggalPenyelesaian) }),
             ...(documentType && { documentType: documentType as any }),
           },
         });
+
+        // Handle nested Undangan creation / update
+        if (documentType === "UNDANGAN" && undangan) {
+          const uRecord = await prisma.undangan.upsert({
+            where: { suratMasukId: doc.id },
+            create: {
+              suratMasukId: doc.id,
+              hari: undangan.hari,
+              tanggal: new Date(undangan.tanggalMulai),
+              jam: undangan.jam,
+              tempat: undangan.tempat,
+              media: undangan.media ?? "OFFLINE",
+              dresscode: undangan.dresscode ?? null,
+              catatanLain: undangan.catatanLain ?? null,
+              deadline: new Date(undangan.tanggalSelesai),
+              undanganType: undangan.undanganType ?? "INTERNAL",
+              pengirimExternal: undangan.pengirimExternal ?? null,
+              kontakExternal: undangan.kontakExternal ?? null,
+            },
+            update: {
+              hari: undangan.hari,
+              tanggal: new Date(undangan.tanggalMulai),
+              jam: undangan.jam,
+              tempat: undangan.tempat,
+              media: undangan.media ?? "OFFLINE",
+              dresscode: undangan.dresscode ?? null,
+              catatanLain: undangan.catatanLain ?? null,
+              deadline: new Date(undangan.tanggalSelesai),
+              undanganType: undangan.undanganType ?? "INTERNAL",
+              pengirimExternal: undangan.pengirimExternal ?? null,
+              kontakExternal: undangan.kontakExternal ?? null,
+            },
+          });
+
+          // Sync penerima
+          if (undangan.penerimaIds && Array.isArray(undangan.penerimaIds)) {
+            await prisma.undanganPenerima.deleteMany({
+              where: { undanganId: uRecord.id },
+            });
+
+            if (undangan.penerimaIds.length > 0) {
+              await prisma.undanganPenerima.createMany({
+                data: undangan.penerimaIds.map((uid) => ({
+                  undanganId: uRecord.id,
+                  userId: uid,
+                })),
+              });
+
+              // Simulate Email sending in background
+              const recipientUsers = await prisma.user.findMany({
+                where: { id: { in: undangan.penerimaIds } },
+                select: { email: true, name: true },
+              });
+
+              console.log("=========================================");
+              console.log("📧 SIMULASI PENGIRIMAN EMAIL NOTIFIKASI");
+              console.log(`Undangan: ${perihal || doc.perihal}`);
+              console.log(`Waktu: ${undangan.hari}, ${undangan.tanggalMulai} s/d ${undangan.tanggalSelesai}`);
+              console.log(`Tempat: ${undangan.tempat} (${undangan.media})`);
+              console.log("Daftar Penerima:");
+              recipientUsers.forEach((u) => {
+                console.log(`  - ${u.name} <${u.email}>`);
+              });
+              console.log("Status: Berhasil Terkirim Via SMTP");
+              console.log("=========================================");
+            }
+          }
+        }
 
         await createStatusTimeline({
           suratMasukId: doc.id,

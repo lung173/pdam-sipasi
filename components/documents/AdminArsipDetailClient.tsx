@@ -10,8 +10,10 @@ import { StatusTimeline } from "@/components/documents/StatusTimeline";
 import { AdminArchivePanel } from "@/components/documents/AdminArchivePanel";
 import { AgendarisActionPanel } from "@/components/documents/AgendarisActionPanel";
 import { FileListViewer } from "@/components/documents/FileListViewer";
+import { UndanganDetail } from "@/components/documents/UndanganDetail";
 import { DECISION_LABELS } from "@/types";
 import { DecisionType } from "@prisma/client";
+import { DisposisiViewer } from "@/components/documents/DisposisiViewer";
 
 export default function AdminArsipDetailClient({ doc, staffUsers }: { doc: any; staffUsers: any }) {
 
@@ -59,6 +61,10 @@ export default function AdminArsipDetailClient({ doc, staffUsers }: { doc: any; 
             )}
           </div>
 
+          {doc.documentType === "UNDANGAN" && doc.undangan && (
+            <UndanganDetail undangan={doc.undangan} perihal={doc.perihal} />
+          )}
+
           {/* Keputusan Direktur */}
           {latestDecision && (
             <div className="card p-4 bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark:border-purple-800 space-y-2">
@@ -90,10 +96,11 @@ export default function AdminArsipDetailClient({ doc, staffUsers }: { doc: any; 
           />
 
           {/* Lembar Disposisi (tampil setelah Direktur memberikan keputusan) */}
-          {doc.currentStatus === "KEPUTUSAN_DIREKTUR_SELESAI" && (
-            <div className="card p-5 space-y-4">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <h3 className="font-semibold text-gray-900 dark:text-white">Lembar Disposisi</h3>
+          {doc.currentStatus === "KEPUTUSAN_DIREKTUR_SELESAI" && latestDisposisi && (
+            <DisposisiViewer
+              disposisi={latestDisposisi}
+              doc={doc}
+              actions={
                 <div className="flex flex-wrap items-center gap-2">
                   <Link
                     href={`/dashboard/admin/arsip/${doc.id}/cetak-disposisi`}
@@ -102,90 +109,16 @@ export default function AdminArsipDetailClient({ doc, staffUsers }: { doc: any; 
                   >
                     <Printer className="w-4 h-4" /> Cetak Lembar Disposisi
                   </Link>
-                  <a
-                    href={`/api/documents/${doc.id}/print-combined`}
+                  <Link
+                    href={`/dashboard/admin/arsip/${doc.id}/cetak-gabungan`}
                     target="_blank"
                     className="inline-flex items-center justify-center gap-2 text-sm font-medium px-4 py-2 bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white rounded-xl transition-all shadow-sm shadow-emerald-200 dark:shadow-none hover:-translate-y-0.5"
                   >
                     <Printer className="w-4 h-4" /> Cetak Gabungan (Surat + Disposisi)
-                  </a>
+                  </Link>
                 </div>
-              </div>
-
-              <div className="border-2 border-gray-400 dark:border-slate-600 rounded-lg overflow-hidden text-sm bg-white dark:bg-slate-900">
-                {/* Header */}
-                <div className="border-b-2 border-gray-400 dark:border-slate-600 py-3 px-4 text-center">
-                  <p className="text-[11px] font-bold text-gray-800 dark:text-gray-200 uppercase tracking-wide leading-snug">
-                    PERUSAHAAN UMUM DAERAH AIR MINUM TIRTA MAKMUR KABUPATEN SUKOHARJO
-                  </p>
-                  <p className="text-base font-bold mt-1 tracking-widest text-gray-900 dark:text-white">
-                    {doc.documentType === "UNDANGAN" ? "LEMBAR DISPOSISI SURAT UNDANGAN" : "LEMBAR DISPOSISI SURAT MASUK"}
-                  </p>
-                </div>
-
-                {/* Info rows */}
-                <div className="divide-y divide-gray-300 dark:divide-slate-700 border-b-2 border-gray-400 dark:border-slate-600 text-xs">
-                  <div className="grid grid-cols-2 divide-x divide-gray-300 dark:divide-slate-700">
-                    <DisposisiRow label="Tanggal Surat" value={format(new Date(doc.tanggalSurat), "dd MMMM yyyy", { locale: localeId })} />
-                    <DisposisiRow label="Tanggal Terima" value={format(new Date(doc.tanggalTerima), "dd MMMM yyyy", { locale: localeId })} />
-                  </div>
-                  <div className="grid grid-cols-2 divide-x divide-gray-300 dark:divide-slate-700">
-                    <DisposisiRow label="Asal Surat" value={doc.asalSurat ?? "-"} />
-                    <DisposisiRow label="No. Agenda" value={doc.nomorAgenda ?? "-"} />
-                  </div>
-                  <div className="grid grid-cols-2 divide-x divide-gray-300 dark:divide-slate-700">
-                    <DisposisiRow label="Perihal" value={doc.perihal} />
-                    <DisposisiRow label="Nomor Surat" value={doc.nomorSurat} mono />
-                  </div>
-                </div>
-
-                {/* Disposisi Kepada + Tanggal Penyelesaian */}
-                <div className="grid grid-cols-2 divide-x divide-gray-300 dark:divide-slate-700 border-b-2 border-gray-400 dark:border-slate-600 text-xs">
-                  <div className="p-3">
-                    <p className="font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wide mb-2">Disposisi Kepada :</p>
-                    <div className="text-gray-900 dark:text-gray-100 font-semibold text-sm">
-                      {latestDisposisi?.jabatanKe ? (
-                        <ul className="list-decimal pl-4 space-y-0.5">
-                          {latestDisposisi.jabatanKe.split(",").map((j: string, i: number) => (
-                            <li key={i}>{j.trim()}</li>
-                          ))}
-                        </ul>
-                      ) : (
-                        <p>-</p>
-                      )}
-                    </div>
-                  </div>
-                  <div className="p-3 space-y-2">
-                    <div>
-                      <p className="font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wide mb-1">Tanggal Penyelesaian :</p>
-                      <p className="text-blue-700 dark:text-blue-400 font-medium">
-                        {latestDisposisi?.tanggalTandaTangan
-                          ? format(new Date(latestDisposisi.tanggalTandaTangan), "dd MMMM yyyy", { locale: localeId })
-                          : "-"}
-                      </p>
-                    </div>
-                    {latestDisposisi?.keterangan && (
-                      <div>
-                        <p className="font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wide mb-1">Catatan :</p>
-                        <p className="text-blue-700 dark:text-blue-400 font-medium whitespace-pre-wrap">{latestDisposisi?.keterangan}</p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Instruksi */}
-                <div className="p-3 text-xs">
-                  <p className="font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wide mb-1.5">Isi Instruksi / Informasi :</p>
-                  <p className="text-blue-700 dark:text-blue-400 font-medium whitespace-pre-wrap leading-relaxed">{latestDisposisi?.instruksi ?? "-"}</p>
-                </div>
-
-                {/* Footer */}
-                <div className="border-t border-gray-200 dark:border-slate-700 px-3 py-2 bg-gray-50 dark:bg-slate-800/50 flex justify-between text-[10px] text-gray-400 dark:text-slate-500">
-                  <span>Dari: {latestDisposisi?.dari?.name ?? "-"}</span>
-                  <span>Status: Dikembalikan ke Agendaris</span>
-                </div>
-              </div>
-            </div>
+              }
+            />
           )}
 
           {/* Review action */}

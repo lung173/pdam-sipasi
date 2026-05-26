@@ -14,6 +14,7 @@ import { StatusBadge } from "@/components/ui/StatusBadge";
 import { StatusTimeline } from "@/components/documents/StatusTimeline";
 import { DisposisiViewer } from "@/components/documents/DisposisiViewer";
 import { FileListViewer } from "@/components/documents/FileListViewer";
+import { UndanganDetail } from "@/components/documents/UndanganDetail";
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -41,6 +42,17 @@ export default async function KabagDocumentDetail(props: Params) {
         },
         orderBy: { createdAt: "desc" },
         take: 1,
+      },
+      undangan: {
+        include: {
+          penerima: {
+            include: {
+              user: {
+                select: { id: true, name: true, divisi: true }
+              }
+            }
+          }
+        }
       },
     },
   });
@@ -96,6 +108,10 @@ export default async function KabagDocumentDetail(props: Params) {
                 value={`${doc.createdBy.name} (${doc.createdBy.divisi ?? "-"})`} />
             </div>
           </div>
+
+          {doc.documentType === "UNDANGAN" && doc.undangan && (
+            <UndanganDetail undangan={doc.undangan as any} perihal={doc.perihal} />
+          )}
 
           {/* Lembar Disposisi Digital */}
           {latestDisposisi && (

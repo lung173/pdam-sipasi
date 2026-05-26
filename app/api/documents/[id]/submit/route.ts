@@ -11,8 +11,8 @@ type Params = { params: Promise<{ id: string }> };
 export async function POST(req: NextRequest, props: Params) {
   const params = await props.params;
   return requireAuth(req, async (user, request) => {
-    if (user.role !== "ADMIN_STAFF") {
-      return errorResponse("Hanya Staff yang dapat mengirim dokumen ke Agendaris.", 403);
+    if (user.role !== "ADMIN_STAFF" && user.role !== "AGENDARIS") {
+      return errorResponse("Hanya Staff atau Agendaris yang dapat mengirim dokumen.", 403);
     }
 
     try {
@@ -24,7 +24,12 @@ export async function POST(req: NextRequest, props: Params) {
       if (!doc) return errorResponse("Dokumen tidak ditemukan.", 404);
       if (doc.createdById !== user.id) return errorResponse("Akses ditolak.", 403);
 
-      if (!["DRAFT", "PERLU_REVISI"].includes(doc.currentStatus)) {
+      const allowedStatuses = ["DRAFT", "PERLU_REVISI"];
+      if (user.role === "AGENDARIS") {
+        allowedStatuses.push("MENUNGGU_REVIEW_AGENDARIS");
+      }
+
+      if (!allowedStatuses.includes(doc.currentStatus)) {
         return errorResponse(
           `Dokumen tidak dapat dikirim dari status "${doc.currentStatus}".`,
           400
@@ -51,21 +56,30 @@ export async function POST(req: NextRequest, props: Params) {
         fromStatus: prevStatus,
         toStatus: "MENUNGGU_REVIEW_AGENDARIS",
         changedBy: user.id,
-        notes: "Dokumen dikirim ke Agendaris untuk review",
+        notes: user.role === "AGENDARIS"
+          ? "Dokumen siap diproses oleh Agendaris"
+          : "Dokumen dikirim ke Agendaris untuk review",
       });
 
       await createAuditLog({
         userId: user.id,
         suratMasukId: doc.id,
         action: "DOCUMENT_SUBMITTED",
-        description: `${doc.nomorSurat} dikirim ke Agendaris`,
+        description: user.role === "AGENDARIS"
+          ? `${doc.nomorSurat} siap diproses oleh Agendaris`
+          : `${doc.nomorSurat} dikirim ke Agendaris`,
         ipAddress: getClientIp(request),
       });
 
-      return successResponse(updated, "Dokumen berhasil dikirim ke Agendaris.");
+      return successResponse(
+        updated,
+        user.role === "AGENDARIS"
+          ? "Dokumen berhasil diproses."
+          : "Dokumen berhasil dikirim ke Agendaris."
+      );
     } catch (error) {
       console.error("[POST /api/documents/[id]/submit]", error);
-      return errorResponse("Gagal mengirim dokumen.", 500);
+      return errorResponse("Gagal memproses dokumen.", 500);
     }
   });
 }
