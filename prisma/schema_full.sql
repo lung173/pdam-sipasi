@@ -646,3 +646,23 @@ BEGIN
   RAISE NOTICE '  Direktur  → direktur@pdam.go.id  / Direktur@12345';
   RAISE NOTICE '========================================';
 END $$;
+
+CREATE TABLE IF NOT EXISTS "undangan_reminder_log" (
+    "id"           TEXT         NOT NULL,
+    "undangan_id"  TEXT         NOT NULL,
+    "reminder_type" TEXT        NOT NULL, -- 'H3', 'H1', 'H0'
+    "sent_at"      TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+    "recipient_count" INTEGER   NOT NULL DEFAULT 0,
+    "is_success"   BOOLEAN      NOT NULL DEFAULT TRUE,
+    "error_message" TEXT,
+
+    CONSTRAINT "undangan_reminder_log_pkey" PRIMARY KEY ("id"),
+    CONSTRAINT "fk_reminder_undangan" FOREIGN KEY ("undangan_id")
+        REFERENCES "undangan"("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS "undangan_reminder_log_undangan_id_type_key"
+    ON "undangan_reminder_log"("undangan_id", "reminder_type");
+
+CREATE INDEX IF NOT EXISTS "undangan_reminder_log_undangan_id_idx"
+    ON "undangan_reminder_log"("undangan_id");
