@@ -163,7 +163,7 @@ export default async function CetakDisposisi(props: Params) {
             {/* Top: Tanggal Penyelesaian */}
             <div style={{ marginBottom: '24px' }}>
               <p style={{ fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '10px', fontSize: '13px' }}>Tanggal Penyelesaian</p>
-              <div style={{ borderBottom: '1px dotted #555', paddingBottom: '4px', fontWeight: 'bold', fontSize: '14px', color: '#1d4ed8', minHeight: '24px' }}>
+              <div style={{ paddingBottom: '4px', fontWeight: 'bold', fontSize: '14px', color: '#1d4ed8', minHeight: '24px' }}>
                 {latestDisposisi?.tanggalPenyelesaian || latestDisposisi?.tanggalTandaTangan
                   ? format(new Date((latestDisposisi.tanggalPenyelesaian || latestDisposisi.tanggalTandaTangan) as Date), "dd MMMM yyyy", { locale: localeId })
                   : "-"}
@@ -173,17 +173,13 @@ export default async function CetakDisposisi(props: Params) {
             {/* Bottom: Catatan value & Guidelines */}
             <div style={{ flexGrow: 1 }}>
               {latestDisposisi?.keterangan ? (
-                <p style={{ whiteSpace: 'pre-wrap', fontSize: '14px', color: '#1d4ed8', fontWeight: 'bold', borderBottom: '1px dotted #555', paddingBottom: '8px', marginBottom: '12px' }}>
-                  {latestDisposisi.keterangan}
-                </p>
+                <>
+                  <p style={{ fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '14px', fontSize: '13px' }}>Catatan :</p>
+                  <p style={{ whiteSpace: 'pre-wrap', fontSize: '14px', color: '#1d4ed8', fontWeight: 'bold', paddingBottom: '8px', marginBottom: '12px' }}>
+                    {latestDisposisi.keterangan}
+                  </p>
+                </>
               ) : null}
-
-              {/* Dotted lines filling */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                {Array.from({ length: latestDisposisi?.keterangan ? 5 : 7 }).map((_, i) => (
-                  <div key={i} style={{ borderBottom: '1px dotted #555', height: '10px' }} />
-                ))}
-              </div>
             </div>
           </div>
         </div>

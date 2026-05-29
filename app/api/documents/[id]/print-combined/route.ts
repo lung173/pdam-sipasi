@@ -174,23 +174,6 @@ export async function GET(req: NextRequest, props: Params) {
         leftY -= 15;
       });
 
-      leftY -= 18;
-      dispPage.drawText("ISI INSTRUKSI / INFORMASI :", { x: margin + 15, y: leftY, size: 9.5, font: fontBold });
-      leftY -= 18;
-
-      if (latestDisp?.instruksi) {
-        dispPage.drawText(latestDisp.instruksi, {
-          x: margin + 15,
-          y: leftY,
-          size: 11,
-          font: fontBold,
-          color: rgb(0.11, 0.3, 0.85),
-          maxWidth: width / 2 - margin - 25,
-        });
-      } else {
-        dispPage.drawText("-", { x: margin + 15, y: leftY, size: 11, font: fontBold, color: rgb(0.11, 0.3, 0.85) });
-      }
-
       // Director signature placement (Left column, bottom right)
       if (latestDisp?.dari?.signature) {
         try {
@@ -253,18 +236,12 @@ export async function GET(req: NextRequest, props: Params) {
         
       dispPage.drawText(completionDate, { x: width / 2 + 15, y: rightY, size: 10.5, font: fontBold, color: rgb(0.11, 0.3, 0.85) });
 
-      // Draw dotted underline for completion date
-      dispPage.drawLine({
-        start: { x: width / 2 + 15, y: rightY - 5 },
-        end: { x: width - margin - 15, y: rightY - 5 },
-        thickness: 1,
-        dashArray: [2, 2],
-      });
-
-      rightY -= 35;
+      rightY -= 25;
 
       // Draw Keterangan/Notes value if available
       if (latestDisp?.keterangan) {
+        dispPage.drawText("CATATAN :", { x: width / 2 + 15, y: rightY, size: 9.5, font: fontBold });
+        rightY -= 16;
         dispPage.drawText(latestDisp.keterangan, {
           x: width / 2 + 15,
           y: rightY,
@@ -274,17 +251,6 @@ export async function GET(req: NextRequest, props: Params) {
           maxWidth: width - margin - (width / 2 + 30),
         });
         rightY -= 20;
-      }
-
-      // Draw 6 dotted guideline rows (Catatan simulation lines)
-      for (let i = 0; i < 6; i++) {
-        dispPage.drawLine({
-          start: { x: width / 2 + 15, y: rightY },
-          end: { x: width - margin - 15, y: rightY },
-          thickness: 1,
-          dashArray: [2, 2],
-        });
-        rightY -= 22;
       }
 
       // --- 2. MERGE MAIN DOCUMENT (FALLBACK: Try FINAL_SCAN first, then DRAFT) ---

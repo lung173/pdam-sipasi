@@ -29,17 +29,11 @@ export async function POST(req: NextRequest, props: Params) {
       if (!doc) return errorResponse("Dokumen tidak ditemukan.", 404);
       if (doc.archive) return errorResponse("Dokumen ini sudah diarsipkan.", 409);
 
-      if (doc.currentStatus !== "MENUNGGU_ARSIP_ADMIN") {
+      if (!["MENUNGGU_ARSIP_ADMIN", "KEPUTUSAN_DIREKTUR_SELESAI"].includes(doc.currentStatus)) {
         return errorResponse(
           `Dokumen belum siap diarsipkan. Status saat ini: ${doc.currentStatus}`,
           400
         );
-      }
-
-      // Pastikan ada file FINAL_SCAN
-      const hasFinalScan = doc.files.some((f) => f.fileType === "FINAL_SCAN");
-      if (!hasFinalScan) {
-        return errorResponse("Belum ada file scan final yang diupload untuk dokumen ini.", 400);
       }
 
       const prevStatus = doc.currentStatus;

@@ -212,9 +212,6 @@ export async function POST(req: NextRequest, props: Params) {
           400
         );
       }
-      if (!instruksi?.trim()) {
-        return errorResponse("Isi instruksi/informasi wajib diisi.", 400);
-      }
 
       const doc = await prisma.suratMasuk.findUnique({ where: { id: params.id } });
       if (!doc) return errorResponse("Dokumen tidak ditemukan.", 404);

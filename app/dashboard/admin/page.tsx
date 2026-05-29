@@ -12,7 +12,7 @@ import { ROLE_LABELS } from "@/types";
 import { UserRole, DocumentStatus } from "@prisma/client";
 import {
   FileText, Users, Archive, CheckCircle, Eye, ArrowRight,
-  Activity, Clock, Plus,
+  Activity, Clock, Plus, Calendar as CalendarIcon, MessageCircle,
 } from "lucide-react";
 
 export default async function AdminDashboard() {
@@ -21,22 +21,26 @@ export default async function AdminDashboard() {
 
   const [
     totalDokumen, totalUser, menungguArsip, arsipFinal,
-    antrian, recentAudit, docPerStatus,
+    menungguKeputusan, jadwalTerdekat, docPerStatus,
   ] = await Promise.all([
     prisma.suratMasuk.count(),
     prisma.user.count({ where: { isActive: true } }),
-    prisma.suratMasuk.count({ where: { currentStatus: "MENUNGGU_ARSIP_ADMIN" } }),
+    prisma.suratMasuk.count({ where: { currentStatus: { in: ["MENUNGGU_ARSIP_ADMIN", "KEPUTUSAN_DIREKTUR_SELESAI"] } } }),
     prisma.suratMasuk.count({ where: { currentStatus: "ARSIP_FINAL_TERSIMPAN" } }),
     prisma.suratMasuk.findMany({
-      where: { currentStatus: "MENUNGGU_ARSIP_ADMIN" },
+      where: { currentStatus: { in: ["MENUNGGU_KEPUTUSAN_DIREKTUR", "DIPROSES_DIREKTUR"] } },
       include: { createdBy: { select: { name: true, divisi: true } } },
-      orderBy: { updatedAt: "asc" },
+      orderBy: { updatedAt: "desc" },
       take: 5,
     }),
-    prisma.auditLog.findMany({
-      take: 8,
-      orderBy: { createdAt: "desc" },
-      include: { user: { select: { name: true, role: true } } },
+    prisma.undangan.findMany({
+      where: { tanggal: { gte: new Date(new Date().setHours(0, 0, 0, 0)) } },
+      include: { 
+        suratMasuk: true,
+        penerima: { include: { user: { select: { email: true } } } }
+      },
+      orderBy: { tanggal: "asc" },
+      take: 5,
     }),
     prisma.suratMasuk.groupBy({
       by: ["currentStatus"],
@@ -95,28 +99,32 @@ export default async function AdminDashboard() {
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Antrian Arsip */}
-        <div className="card">
+        {/* Menunggu Keputusan Direktur */}
+        <div className="card flex flex-col h-full">
           <div className="px-5 py-4 border-b border-gray-100 dark:border-slate-800 flex items-center justify-between">
-            <h2 className="font-semibold text-gray-900 dark:text-white">Antrian Arsip</h2>
-            <Link href="/dashboard/admin/arsip" className="text-xs text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1">
+            <h2 className="font-semibold text-gray-900 dark:text-white">Menunggu Keputusan Direktur</h2>
+            <Link href="/dashboard/admin/dokumen" className="text-xs text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1">
               Semua <ArrowRight className="w-3 h-3" />
             </Link>
           </div>
-          {antrian.length === 0 ? (
-            <div className="p-6 text-center text-sm text-gray-400 dark:text-slate-500">Tidak ada antrian arsip.</div>
+          {menungguKeputusan.length === 0 ? (
+            <div className="p-6 text-center text-sm text-gray-400 dark:text-slate-500 flex-grow flex items-center justify-center">
+              Semua dokumen sudah diproses Direktur.
+            </div>
           ) : (
-            <div className="divide-y divide-gray-100 dark:divide-slate-800">
-              {antrian.map((doc) => (
+            <div className="divide-y divide-gray-100 dark:divide-slate-800 flex-grow">
+              {menungguKeputusan.map((doc) => (
                 <div key={doc.id} className="flex items-center gap-4 px-5 py-3 hover:bg-gray-50 dark:hover:bg-slate-800/50">
                   <div className="flex-1 min-w-0">
                     <p className="font-mono text-xs text-blue-700 dark:text-blue-400">{doc.nomorSurat}</p>
-                    <p className="text-sm text-gray-800 dark:text-slate-200 truncate">{doc.perihal}</p>
-                    <p className="text-xs text-gray-400 dark:text-slate-500">Dari: {doc.createdBy.name}</p>
+                    <p className="text-sm text-gray-800 dark:text-slate-200 truncate font-medium">{doc.perihal}</p>
+                    <p className="text-xs text-gray-500 mt-0.5">
+                      <StatusBadge status={doc.currentStatus} size="sm" />
+                    </p>
                   </div>
-                  <Link href={`/dashboard/admin/arsip/${doc.id}`}
-                    className="p-1.5 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded text-gray-400 dark:text-slate-500 hover:text-blue-600 dark:hover:text-blue-400">
-                    <Eye className="w-4 h-4" />
+                  <Link href={`/dashboard/admin/dokumen/${doc.id}`}
+                    className="p-1.5 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded text-blue-600 dark:text-blue-400 hover:text-blue-700 font-medium text-xs flex items-center gap-1">
+                    Cek <ArrowRight className="w-3 h-3" />
                   </Link>
                 </div>
               ))}
@@ -124,38 +132,75 @@ export default async function AdminDashboard() {
           )}
         </div>
 
-        {/* Audit log */}
-        <div className="card">
+        {/* Jadwal Terdekat (Undangan) */}
+        <div className="card flex flex-col h-full">
           <div className="px-5 py-4 border-b border-gray-100 dark:border-slate-800 flex items-center justify-between">
-            <h2 className="font-semibold text-gray-900 dark:text-white">Aktivitas Terbaru</h2>
-            <Link href="/dashboard/admin/audit" className="text-xs text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1">
-              Semua Log <ArrowRight className="w-3 h-3" />
+            <h2 className="font-semibold text-gray-900 dark:text-white">Jadwal Terdekat (Undangan)</h2>
+            <Link href="/dashboard/admin/dokumen" className="text-xs text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1">
+              Jadwal <ArrowRight className="w-3 h-3" />
             </Link>
           </div>
-          <div className="divide-y divide-gray-100 dark:divide-slate-800">
-            {recentAudit.map((log) => (
-              <div key={log.id} className="flex items-start gap-3 px-5 py-3">
-                <div className="w-7 h-7 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">
-                  {log.user.name.charAt(0)}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs font-medium text-gray-900 dark:text-slate-200">
-                    {log.user.name}
-                    <span className="text-gray-400 dark:text-slate-500 font-normal ml-1">
-                      ({ROLE_LABELS[log.user.role as UserRole]})
-                    </span>
-                  </p>
-                  <p className="text-xs text-gray-600 dark:text-slate-400 truncate">{log.description ?? log.action}</p>
-                  <p className="text-xs text-gray-400 dark:text-slate-500">
-                    {format(new Date(log.createdAt), "dd MMM, HH:mm", { locale: localeId })}
-                  </p>
-                </div>
-                <span className="text-[10px] bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-400 px-1.5 py-0.5 rounded font-mono whitespace-nowrap">
-                  {log.action}
-                </span>
-              </div>
-            ))}
-          </div>
+          {jadwalTerdekat.length === 0 ? (
+            <div className="p-6 text-center text-sm text-gray-400 dark:text-slate-500 flex-grow flex items-center justify-center">
+              Tidak ada jadwal undangan terdekat.
+            </div>
+          ) : (
+            <div className="divide-y divide-gray-100 dark:divide-slate-800 flex-grow">
+              {jadwalTerdekat.map((undangan) => {
+                const dateStr = format(new Date(undangan.tanggal), 'yyyyMMdd');
+                const gcalTitle = encodeURIComponent(undangan.suratMasuk.perihal);
+                const gcalDetails = encodeURIComponent("Terkait surat: " + undangan.suratMasuk.nomorSurat);
+                const gcalLocation = encodeURIComponent(undangan.tempat);
+                
+                // Get all emails from invitees
+                const guestEmails = undangan.penerima
+                  .map(p => p.user.email)
+                  .filter(Boolean)
+                  .join(',');
+                
+                const addGuestsParam = guestEmails ? `&add=${encodeURIComponent(guestEmails)}` : '';
+                const gcalLink = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${gcalTitle}&details=${gcalDetails}&location=${gcalLocation}&dates=${dateStr}T010000Z/${dateStr}T030000Z${addGuestsParam}`;
+
+                const waText = encodeURIComponent(
+                  `🔔 *PEMBERITAHUAN JADWAL KEGIATAN* 🔔\n\n` +
+                  `Yth. Bapak/Ibu,\n` +
+                  `Mengingatkan bahwa terdapat agenda kegiatan yang perlu dihadiri:\n\n` +
+                  `📌 *Agenda:*\n${undangan.suratMasuk.perihal}\n\n` +
+                  `✉️ *Terkait Surat:*\n${undangan.suratMasuk.nomorSurat}\n\n` +
+                  `🗓️ *Waktu Pelaksanaan:*\n` +
+                  `• Hari, Tanggal: ${undangan.hari}, ${format(new Date(undangan.tanggal), 'dd MMMM yyyy', { locale: localeId })}\n` +
+                  `• Pukul: ${undangan.jam} WIB\n\n` +
+                  `📍 *Lokasi/Media:*\n${undangan.tempat} (${undangan.media})\n\n` +
+                  `📝 *Pakaian/Dresscode:*\n${undangan.dresscode ? undangan.dresscode : '-'}\n\n` +
+                  `Dimohon kehadirannya tepat waktu.\nTerima kasih. 🙏`
+                );
+                const waLink = `https://wa.me/?text=${waText}`;
+
+                return (
+                  <div key={undangan.id} className="flex items-start gap-3 px-5 py-3">
+                    <div className="w-10 h-10 rounded-lg bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-100 dark:border-indigo-800 flex flex-col items-center justify-center shrink-0">
+                      <span className="text-[10px] font-bold text-indigo-500 uppercase leading-none">{format(new Date(undangan.tanggal), 'MMM', { locale: localeId })}</span>
+                      <span className="text-sm font-bold text-indigo-700 dark:text-indigo-300 leading-none mt-0.5">{format(new Date(undangan.tanggal), 'dd')}</span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-900 dark:text-slate-200 truncate">{undangan.suratMasuk.perihal}</p>
+                      <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">
+                        {undangan.jam} • {undangan.tempat}
+                      </p>
+                      <div className="flex gap-2 mt-2">
+                        <a href={gcalLink} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 px-2 py-1 bg-white border border-gray-200 hover:bg-gray-50 text-gray-600 rounded text-[10px] font-medium transition-colors">
+                          <CalendarIcon className="w-3 h-3 text-blue-500" /> Google Calendar
+                        </a>
+                        <a href={waLink} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 px-2 py-1 bg-white border border-gray-200 hover:bg-emerald-50 text-gray-600 rounded text-[10px] font-medium transition-colors">
+                          <MessageCircle className="w-3 h-3 text-emerald-500" /> Share WhatsApp
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       </div>
 

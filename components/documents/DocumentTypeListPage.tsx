@@ -120,7 +120,7 @@ export function DocumentTypeListPage({
             className="btn-secondary whitespace-nowrap"
           >
             <Download className="w-4 h-4" />
-            Export CSV
+            Export Excel
           </button>
           {showCreateButton && (
             <Link

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
-import { Send, RotateCcw, Bell, Loader2, GitBranch, Clock } from "lucide-react";
+import { Send, RotateCcw, Bell, Loader2, GitBranch, Clock, Archive, FileText } from "lucide-react";
 import { format } from "date-fns";
 import { id as localeId } from "date-fns/locale";
 
@@ -17,6 +17,8 @@ interface DocProps {
   tanggalTerima?: Date | string;
   asalSurat?: string | null;
   nomorAgenda?: string | null;
+  documentType?: string;
+  files?: any[];
   category?: string;
   undangan?: {
     hari: string;
@@ -588,84 +590,7 @@ export function AgendarisActionPanel({
                     </div>
                   </div>
 
-                  {/* Tipe Undangan */}
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    <div>
-                      <label className="block text-[10px] font-bold text-gray-700 dark:text-slate-400 uppercase mb-1">Tipe Undangan</label>
-                      <div className="flex gap-2">
-                        <button
-                          type="button"
-                          onClick={() => setUUndanganType("INTERNAL")}
-                          className={`flex-1 py-1 rounded border text-[10px] font-bold uppercase transition-all
-                            ${uUndanganType === "INTERNAL" ? "bg-purple-100 dark:bg-purple-900/50 border-purple-500 text-purple-800 dark:text-purple-300" : "bg-white dark:bg-slate-800 text-gray-600 dark:text-slate-400"}`}
-                        >
-                          Internal
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setUUndanganType("EXTERNAL")}
-                          className={`flex-1 py-1 rounded border text-[10px] font-bold uppercase transition-all
-                            ${uUndanganType === "EXTERNAL" ? "bg-purple-100 dark:bg-purple-900/50 border-purple-500 text-purple-800 dark:text-purple-300" : "bg-white dark:bg-slate-800 text-gray-600 dark:text-slate-400"}`}
-                        >
-                          Eksternal
-                        </button>
-                      </div>
-                    </div>
-                    
-                    {uUndanganType === "EXTERNAL" && (
-                      <>
-                        <div>
-                          <label className="block text-[10px] font-bold text-gray-700 dark:text-slate-400 uppercase mb-1">Instansi Pengirim</label>
-                          <input
-                            className="form-input text-xs py-1"
-                            placeholder="Nama instansi..."
-                            value={uPengirimExternal}
-                            onChange={(e) => setUPengirimExternal(e.target.value)}
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-[10px] font-bold text-gray-700 dark:text-slate-400 uppercase mb-1">No. Kontak Pengirim</label>
-                          <input
-                            className="form-input text-xs py-1"
-                            placeholder="Nomor WA/Telp..."
-                            value={uKontakExternal}
-                            onChange={(e) => setUKontakExternal(e.target.value)}
-                          />
-                        </div>
-                      </>
-                    )}
-                  </div>
 
-                  {/* Penerima Undangan (Internal Staff Checklist) */}
-                  <div>
-                    <label className="block text-[10px] font-bold text-gray-700 dark:text-slate-400 uppercase mb-1.5 flex items-center gap-1">
-                      <span>👥</span> Pilih Penerima Undangan Internal
-                    </label>
-                    <div className="grid grid-cols-2 gap-1.5 bg-white dark:bg-slate-800 p-2 rounded border max-h-[8.5rem] overflow-y-auto">
-                      {staffUsers.map((s) => (
-                        <label
-                          key={s.id}
-                          className="flex items-center gap-2 px-2 py-1 rounded hover:bg-purple-50 dark:hover:bg-purple-950/20 cursor-pointer transition-colors"
-                        >
-                          <input
-                            type="checkbox"
-                            className="accent-purple-600"
-                            checked={uPenerimaIds.includes(s.id)}
-                            onChange={(e) => {
-                              if (e.target.checked) {
-                                setUPenerimaIds([...uPenerimaIds, s.id]);
-                              } else {
-                                setUPenerimaIds(uPenerimaIds.filter((id) => id !== s.id));
-                              }
-                            }}
-                          />
-                          <span className="text-[10px] font-medium text-gray-700 dark:text-slate-300 truncate">
-                            {s.name} <span className="text-gray-400">({s.divisi || "-"})</span>
-                          </span>
-                        </label>
-                      ))}
-                    </div>
-                  </div>
 
                   {/* Catatan Lain */}
                   <div>
@@ -748,31 +673,15 @@ export function AgendarisActionPanel({
                   </div>
                 </div>
               </div>
-
-              {/* Instruksi / Informasi — read-only untuk Agendaris */}
-              <div className="p-3">
-                <p className="font-bold text-gray-800 mb-1.5 text-xs uppercase tracking-wide">
-                  Isi Instruksi / Informasi :
-                </p>
-                {existingDisposisi?.instruksi ? (
-                  <div className="form-input resize-none bg-blue-50 text-blue-800 border-blue-300 min-h-[4rem] flex items-start pt-1 text-xs whitespace-pre-wrap">
-                    {existingDisposisi.instruksi}
-                  </div>
-                ) : (
-                  <div className="form-input resize-none bg-gray-50 text-gray-400 cursor-not-allowed border-dashed min-h-[4rem] flex items-start pt-1 text-xs">
-                    Diisi oleh Direktur
-                  </div>
-                )}
-              </div>
             </div>
 
             {/* Info banner */}
             <div className="flex items-start gap-2 px-3 py-2.5 rounded-lg bg-blue-50 border border-blue-200 text-xs text-blue-800">
               <span className="shrink-0 mt-0.5">ℹ️</span>
-              {existingDisposisi?.instruksi ? (
+              {existingDisposisi?.jabatanKe ? (
                 <span>Direktur telah mengisi lembar disposisi. Teruskan dokumen ke Direktur untuk konfirmasi keputusan.</span>
               ) : (
-                <span>Setelah diteruskan, <strong>Direktur</strong> akan mengisi Disposisi Kepada, Instruksi, Catatan, dan Tanggal Penyelesaian.</span>
+                <span>Setelah diteruskan, <strong>Direktur</strong> akan mengisi Disposisi Kepada, Catatan, dan Tanggal Instruksi.</span>
               )}
             </div>
 
@@ -797,34 +706,81 @@ export function AgendarisActionPanel({
     );
   }
 
-  // ─── SETELAH KEPUTUSAN DIREKTUR ──────────────────────────────
+  // ─── SETELAH KEPUTUSAN DIREKTUR (Legacy - Belum Diarsipkan) ──
   if (doc.currentStatus === "KEPUTUSAN_DIREKTUR_SELESAI") {
     return (
-      <div className="card p-5 bg-orange-50 dark:bg-orange-900/20 border-orange-200 dark:border-orange-800 space-y-3">
-        <h3 className="font-semibold text-orange-900 dark:text-orange-200">Hubungi Staff</h3>
-        <p className="text-sm text-orange-700 dark:text-orange-400">
-          Direktur telah memberikan keputusan. Beritahu Staff untuk mengambil surat fisik.
+      <div className="card p-5 bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800 space-y-3">
+        <h3 className="font-semibold text-emerald-900 dark:text-emerald-200">Keputusan Selesai</h3>
+        <p className="text-sm text-emerald-700 dark:text-emerald-400">
+          Direktur telah memberikan keputusan. Karena sistem tidak lagi menggunakan staff admin, silakan simpan dokumen ini ke arsip.
         </p>
-        <button
-          onClick={async () => {
-            setLoading(true);
-            try {
-              const res = await fetch(`/api/documents/${doc.id}/notify-pickup`, { method: "POST" });
-              const json = await res.json();
-              if (!res.ok) throw new Error(json.error ?? "Gagal.");
-              toast.success("Notifikasi pengambilan berhasil dikirim ke Staff!");
-              router.refresh();
-            } catch (err: unknown) {
-              toast.error(err instanceof Error ? err.message : "Terjadi kesalahan.");
-            } finally { setLoading(false); }
-          }}
-          disabled={loading}
-          className="btn-primary bg-orange-600 hover:bg-orange-700 w-full justify-center"
-        >
-          {loading
-            ? <><Loader2 className="w-4 h-4 animate-spin" /> Mengirim...</>
-            : <><Bell className="w-4 h-4" /> Kirim Notifikasi ke Staff</>}
-        </button>
+        <div className="flex gap-2">
+          {(!doc.documentType || doc.documentType === "SURAT_MASUK") ? (
+            <a
+              href={`/dashboard/admin/arsip/${doc.id}/cetak-gabungan`}
+              target="_blank"
+              className="btn-secondary bg-white text-emerald-700 border-emerald-300 hover:bg-emerald-100 flex-1 justify-center"
+            >
+              <Clock className="w-4 h-4" /> Cetak Berkas Gabungan
+            </a>
+          ) : (
+            <a
+              href={doc.files?.[0]?.filePath ?? "#"}
+              target="_blank"
+              className="btn-secondary bg-white text-emerald-700 border-emerald-300 hover:bg-emerald-100 flex-1 justify-center"
+            >
+              <FileText className="w-4 h-4" /> Lihat Dokumen
+            </a>
+          )}
+          <button
+            onClick={async () => {
+              setLoading(true);
+              try {
+                const res = await fetch(`/api/documents/${doc.id}/archive`, {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ serverLocation: "-", notes: "Diarsipkan otomatis oleh Agendaris" }),
+                });
+                const json = await res.json();
+                if (!res.ok) throw new Error(json.error ?? "Gagal mengarsipkan.");
+                toast.success("Dokumen berhasil disimpan ke arsip!");
+                router.refresh();
+              } catch (err: unknown) {
+                toast.error(err instanceof Error ? err.message : "Terjadi kesalahan.");
+              } finally {
+                setLoading(false);
+              }
+            }}
+            disabled={loading}
+            className="btn-primary bg-emerald-600 hover:bg-emerald-700 flex-1 justify-center"
+          >
+            {loading ? "Menyimpan..." : <><Archive className="w-4 h-4" /> Simpan ke Arsip</>}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // ─── SETELAH KEPUTUSAN DIREKTUR (Otomatis Masuk Arsip) ──────
+  if (doc.currentStatus === "ARSIP_FINAL_TERSIMPAN") {
+    return (
+      <div className="card p-5 bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800 space-y-3">
+        <h3 className="font-semibold text-emerald-900 dark:text-emerald-200">
+          ✅ Dokumen Telah Diarsipkan
+        </h3>
+        <p className="text-sm text-emerald-700 dark:text-emerald-400">
+          Direktur telah memberikan keputusan dan dokumen ini otomatis tersimpan di arsip.
+          {(!doc.documentType || doc.documentType === "SURAT_MASUK") && " Anda dapat mencetak berkas gabungan untuk diteruskan ke pihak terkait."}
+        </p>
+        {(!doc.documentType || doc.documentType === "SURAT_MASUK") && (
+          <a
+            href={`/dashboard/admin/arsip/${doc.id}/cetak-gabungan`}
+            target="_blank"
+            className="btn-primary bg-emerald-600 hover:bg-emerald-700 w-full justify-center"
+          >
+            <Clock className="w-4 h-4" /> Download / Cetak Berkas Gabungan
+          </a>
+        )}
       </div>
     );
   }

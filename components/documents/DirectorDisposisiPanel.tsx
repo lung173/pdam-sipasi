@@ -91,14 +91,7 @@ export function DirectorDisposisiPanel({ docId, existingDisposisi }: DirectorDis
       newErrors.tanggalInstruksi = "Tanggal instruksi wajib diisi.";
     }
 
-    const finalInstruksi = [
-      ...selectedInstruksi.map(i => `- ${i}`),
-      customInstruksi.trim()
-    ].filter(Boolean).join("\n");
-
-    if (!finalInstruksi) {
-      newErrors.instruksi = "Isi instruksi/informasi wajib diisi.";
-    }
+    const finalInstruksi = "";
 
     setErrors(newErrors);
     if (Object.keys(newErrors).length > 0) {
@@ -198,50 +191,7 @@ export function DirectorDisposisiPanel({ docId, existingDisposisi }: DirectorDis
         {errors.jabatanKe && <p className="text-xs text-red-600 mt-1">{errors.jabatanKe}</p>}
       </div>
 
-      {/* Isi Instruksi / Informasi */}
-      <div>
-        <label className="form-label mb-2">
-          Isi Instruksi / Informasi <span className="text-red-500">*</span>
-        </label>
-        
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-3">
-          {INSTRUKSI_OPTIONS.map((opt) => (
-            <label
-              key={opt}
-              className={`flex items-start gap-2 px-3 py-2.5 rounded-lg border cursor-pointer text-xs transition-colors ${
-                selectedInstruksi.includes(opt)
-                  ? "border-blue-500 bg-blue-50 text-blue-900 font-medium ring-1 ring-blue-400"
-                  : "border-gray-200 hover:border-gray-300 text-gray-700"
-              }`}
-            >
-              <input
-                type="checkbox"
-                checked={selectedInstruksi.includes(opt)}
-                onChange={(e) => {
-                  if (e.target.checked) {
-                    setSelectedInstruksi([...selectedInstruksi, opt]);
-                  } else {
-                    setSelectedInstruksi(selectedInstruksi.filter(i => i !== opt));
-                  }
-                }}
-                className="accent-blue-600 mt-0.5 shrink-0"
-                disabled={loading}
-              />
-              <span className="leading-tight">{opt}</span>
-            </label>
-          ))}
-        </div>
 
-        <textarea
-          className="form-input resize-none"
-          rows={2}
-          placeholder="Instruksi tambahan / lain-lain (opsional)..."
-          value={customInstruksi}
-          onChange={(e) => setCustomInstruksi(e.target.value)}
-          disabled={loading}
-        />
-        {errors.instruksi && <p className="text-xs text-red-600 mt-1">{errors.instruksi}</p>}
-      </div>
 
       {/* Tanggal Penyelesaian + Catatan — DIPERLUAS ke bawah */}
       <div className="space-y-4">

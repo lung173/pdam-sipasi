@@ -47,7 +47,7 @@ export async function POST(req: NextRequest, props: Params) {
 
       // Logika Penentuan Status Selanjutnya
       let nextStatus = "KEPUTUSAN_DIREKTUR_SELESAI";
-      let nextHolder = "AGENDARIS"; // Admin karena Agendaris dihapus
+      let nextHolder = "AGENDARIS";
       let auditExtraDescription = "";
 
       // AUTO-SIGN LOGIC — skip jika batalTandaTangan = true
@@ -90,8 +90,6 @@ export async function POST(req: NextRequest, props: Params) {
               }
             });
 
-            // Karena auto-sign, bypass tahap staf cetak fisik -> lgsg ke Admin
-            nextStatus = "MENUNGGU_ARSIP_ADMIN";
             auditExtraDescription = " (Tanda Tangan Elektronik berhasil distamp)";
           } catch (signError) {
             console.error("Gagal auto-sign:", signError);
@@ -101,6 +99,8 @@ export async function POST(req: NextRequest, props: Params) {
         } else {
           auditExtraDescription = " (Peringatan: Gagal TTD, tidak ada file Draft PDF)";
         }
+      } else if (decisionType === "REVISI" || decisionType === "DITOLAK") {
+         nextStatus = "REVISI_DARI_DIREKTUR";
       }
 
       // Jika batalTandaTangan, tambahkan catatan

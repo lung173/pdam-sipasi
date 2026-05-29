@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { requireAuth, errorResponse } from "@/lib/auth-helpers";
 import { format } from "date-fns";
 import { id as localeId } from "date-fns/locale";
+import ExcelJS from "exceljs";
 
 export async function GET(req: NextRequest) {
   return requireAuth(req, async (user, request) => {
@@ -40,6 +41,7 @@ export async function GET(req: NextRequest) {
       const documents = await prisma.suratMasuk.findMany({
         where,
         include: {
+          undangan: true,
           createdBy: { select: { name: true, divisi: true } },
           decisions: {
             orderBy: { decidedAt: "desc" },
@@ -51,51 +53,107 @@ export async function GET(req: NextRequest) {
         orderBy: { updatedAt: "desc" }
       });
 
-      // Format to CSV
+      const workbook = new ExcelJS.Workbook();
+      const worksheet = workbook.addWorksheet("Laporan Dokumen");
+
+      // Title
+      worksheet.mergeCells('A1', 'H1');
+      worksheet.getCell('A1').value = `LAPORAN DOKUMEN ${documentType || ""}`.trim();
+      worksheet.getCell('A1').font = { bold: true, size: 14 };
+
+      // Empty row
+      worksheet.addRow([]);
+
+      // Headers
       const headers = [
-        "No",
-        "Nomor Surat",
-        "Tipe Dokumen",
-        "Perihal",
-        "Asal Surat",
-        "Tanggal Surat",
-        "Dibuat Oleh",
-        "Status Terakhir",
-        "Keputusan Direktur",
-        "Lokasi Arsip"
+        "NO",
+        "NO SURAT",
+        "TGL SURAT",
+        "NO. AGENDA",
+        "TGL. TERIMA",
+        "ASAL SURAT",
+        "PERIHAL",
+        "KETERANGAN"
       ];
-
-      const escapeCsv = (str: string | number | null | undefined) => {
-        if (str === null || str === undefined) return '""';
-        const stringified = String(str).replace(/"/g, '""');
-        return `"${stringified}"`;
-      };
-
-      const csvRows = [headers.map(escapeCsv).join(";")];
-
-      documents.forEach((doc, index) => {
-        const row = [
-          index + 1,
-          doc.nomorSurat,
-          doc.documentType,
-          doc.perihal,
-          doc.asalSurat || "-",
-          format(new Date(doc.tanggalSurat), "dd MMM yyyy", { locale: localeId }),
-          `${doc.createdBy.name} (${doc.createdBy.divisi || "-"})`,
-          doc.currentStatus,
-          doc.decisions[0] ? doc.decisions[0].decisionType : "-",
-          doc.archive ? doc.archive.serverLocation : "-"
-        ];
-        csvRows.push(row.map(escapeCsv).join(";"));
+      
+      const headerRow = worksheet.addRow(headers);
+      headerRow.font = { bold: true };
+      headerRow.alignment = { vertical: 'middle', horizontal: 'center' };
+      headerRow.eachCell((cell) => {
+        cell.border = {
+          top: {style:'thin'},
+          left: {style:'thin'},
+          bottom: {style:'thin'},
+          right: {style:'thin'}
+        };
       });
 
-      const csvContent = "\uFEFF" + "sep=;\n" + csvRows.join("\n");
-      const filename = `Laporan_Dokumen_${format(new Date(), "yyyyMMdd_HHmmss")}.csv`;
+      // Rows
+      documents.forEach((doc, index) => {
+        let keterangan = doc.deskripsi || "-";
+        
+        if (doc.documentType === "UNDANGAN" && doc.undangan) {
+           const u = doc.undangan;
+           const jam = u.jam || "";
+           const tempat = u.tempat || "";
+           const date = u.tanggal ? format(new Date(u.tanggal), "dd MMMM yyyy", { locale: localeId }) : "";
+           
+           let ketLines = [
+             `HARI : ${u.hari || "-"}, ${date}`,
+             `PUKUL : ${jam}`,
+           ];
+           
+           if (u.media === "ONLINE" && u.detailMedia) {
+             ketLines.push(`MEDIA : ${u.detailMedia}`);
+           } else {
+             ketLines.push(`TEMPAT : ${tempat}`);
+           }
+           
+           if (u.dresscode) ketLines.push(`PAKAIAN : ${u.dresscode}`);
+           if (u.catatanLain) ketLines.push(`CATATAN : ${u.catatanLain}`);
+           
+           keterangan = ketLines.join("\n");
+        }
 
-      return new NextResponse(csvContent, {
+        const row = worksheet.addRow([
+          index + 1,
+          doc.nomorSurat,
+          format(new Date(doc.tanggalSurat), "dd MMM yyyy", { locale: localeId }),
+          doc.nomorAgenda || "-",
+          format(new Date(doc.tanggalTerima), "dd MMM yyyy", { locale: localeId }),
+          doc.asalSurat || "-",
+          doc.perihal,
+          keterangan
+        ]);
+
+        row.alignment = { vertical: 'top', wrapText: true };
+        row.eachCell((cell) => {
+          cell.border = {
+            top: {style:'thin'},
+            left: {style:'thin'},
+            bottom: {style:'thin'},
+            right: {style:'thin'}
+          };
+        });
+      });
+
+      // Adjust column widths
+      worksheet.getColumn(1).width = 5;  // NO
+      worksheet.getColumn(2).width = 25; // NO SURAT
+      worksheet.getColumn(3).width = 15; // TGL SURAT
+      worksheet.getColumn(4).width = 15; // NO. AGENDA
+      worksheet.getColumn(5).width = 15; // TGL. TERIMA
+      worksheet.getColumn(6).width = 25; // ASAL SURAT
+      worksheet.getColumn(7).width = 40; // PERIHAL
+      worksheet.getColumn(8).width = 40; // KETERANGAN
+
+      const buffer = await workbook.xlsx.writeBuffer();
+      const filename = `Laporan_Dokumen_${format(new Date(), "yyyyMMdd_HHmmss")}.xlsx`;
+
+      return new NextResponse(buffer, {
         status: 200,
         headers: {
-          "Content-Type": "text/csv; charset=utf-8",
+          "Content-Type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
           "Content-Disposition": `attachment; filename="${filename}"`
         }
       });

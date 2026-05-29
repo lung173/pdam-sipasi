@@ -6,7 +6,7 @@ import Link from "next/link";
 import {
   ChevronLeft, ChevronRight, Calendar, MapPin, Clock,
   Users, AlertTriangle, Bell, BellOff, RefreshCw,
-  Video, Map, Loader2, X, ExternalLink, CheckCircle2,
+  Video, Map as MapIcon, Loader2, X, ExternalLink, CheckCircle2,
 } from "lucide-react";
 import { format, getDaysInMonth, startOfMonth, getDay, isToday, isSameDay, parseISO, differenceInCalendarDays } from "date-fns";
 import { id as localeId } from "date-fns/locale";

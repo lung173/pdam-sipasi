@@ -15,11 +15,11 @@ import type { DocumentType, DocumentCategory } from "@prisma/client";
 const DOC_TYPE_OPTIONS: { type: DocumentType; label: string; icon: React.ElementType; color: string }[] = [
   { type: "UNDANGAN", label: "Undangan", icon: Calendar, color: "border-purple-200 bg-purple-50 text-purple-800 hover:border-purple-500" },
   { type: "SURAT_MASUK", label: "Surat Masuk", icon: MailOpen, color: "border-blue-200 bg-blue-50 text-blue-800 hover:border-blue-500" },
-  { type: "SURAT_TUGAS", label: "Surat Tugas", icon: Briefcase, color: "border-amber-200 bg-amber-50 text-amber-800 hover:border-amber-500" },
+  /* { type: "SURAT_TUGAS", label: "Surat Tugas", icon: Briefcase, color: "border-amber-200 bg-amber-50 text-amber-800 hover:border-amber-500" },
   { type: "SURAT_KELUAR", label: "Surat Keluar", icon: Send, color: "border-emerald-200 bg-emerald-50 text-emerald-800 hover:border-emerald-500" },
   { type: "SK_DIREKTUR", label: "SK Direktur", icon: Award, color: "border-red-200 bg-red-50 text-red-800 hover:border-red-500" },
   { type: "PERJANJIAN", label: "Perjanjian", icon: Handshake, color: "border-cyan-200 bg-cyan-50 text-cyan-800 hover:border-cyan-500" },
-  { type: "PERATURAN_DIREKTUR", label: "Peraturan Direktur", icon: ScrollText, color: "border-orange-200 bg-orange-50 text-orange-800 hover:border-orange-500" },
+  { type: "PERATURAN_DIREKTUR", label: "Peraturan Direktur", icon: ScrollText, color: "border-orange-200 bg-orange-50 text-orange-800 hover:border-orange-500" }, */
 ];
 
 

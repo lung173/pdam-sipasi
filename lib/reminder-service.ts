@@ -120,12 +120,12 @@ async function processUndangan(
     penerima: {
       user: { name: string; phoneNumber: string | null };
     }[];
-    reminderLogs: { reminderType: string }[];
+    undanganReminderLogs: { reminderType: string }[];
   },
   reminderType: ReminderType,
   today: Date
 ): Promise<ReminderResult | null> {
-  const alreadySent = undangan.reminderLogs.some(
+  const alreadySent = undangan.undanganReminderLogs.some(
     (log) => log.reminderType === reminderType
   );
 
@@ -206,7 +206,7 @@ export async function runReminderJob(): Promise<{
           user: { select: { name: true, phoneNumber: true } },
         },
       },
-      reminderLogs: { select: { reminderType: true } },
+      undanganReminderLogs: { select: { reminderType: true } },
     },
   });
 

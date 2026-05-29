@@ -22,13 +22,9 @@ export function AdminArchivePanel({
   const [loading, setLoading] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
 
-  if (doc.currentStatus !== "MENUNGGU_ARSIP_ADMIN") return null;
+  if (!["MENUNGGU_ARSIP_ADMIN", "KEPUTUSAN_DIREKTUR_SELESAI"].includes(doc.currentStatus)) return null;
 
   const handleArchive = async () => {
-    if (!hasScanFile) {
-      toast.error("Tidak bisa mengarsipkan: file scan final belum ada.");
-      return;
-    }
     setLoading(true);
     try {
       const res = await fetch(`/api/documents/${doc.id}/archive`, {
@@ -56,10 +52,10 @@ export function AdminArchivePanel({
       </h3>
 
       {!hasScanFile && (
-        <div className="flex items-start gap-2 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-          <AlertTriangle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
-          <p className="text-sm text-red-700 dark:text-red-400">
-            File scan final belum diupload oleh Staff. Pengarsipan tidak dapat dilakukan.
+        <div className="flex items-start gap-2 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+          <AlertTriangle className="w-4 h-4 text-yellow-500 shrink-0 mt-0.5" />
+          <p className="text-sm text-yellow-700 dark:text-yellow-400">
+            File scan final belum diupload. Anda tetap dapat mengarsipkan dokumen ini jika diperlukan.
           </p>
         </div>
       )}
@@ -71,7 +67,7 @@ export function AdminArchivePanel({
           value={serverLocation}
           onChange={(e) => setServerLocation(e.target.value)}
           placeholder="/arsip/2025/nomor-surat"
-          disabled={loading || !hasScanFile}
+          disabled={loading}
         />
         <p className="text-xs text-gray-400 dark:text-slate-500 mt-1">
           Path direktori di server/database tempat dokumen akan disimpan permanen.
@@ -86,7 +82,7 @@ export function AdminArchivePanel({
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
           placeholder="Catatan pengarsipan, nomor boks fisik, rak, dll..."
-          disabled={loading || !hasScanFile}
+          disabled={loading}
         />
       </div>
 
@@ -100,7 +96,7 @@ export function AdminArchivePanel({
           checked={confirmed}
           onChange={(e) => setConfirmed(e.target.checked)}
           className="mt-0.5 accent-teal-600 w-4 h-4"
-          disabled={!hasScanFile}
+          disabled={loading}
         />
         <label htmlFor="confirm-archive" className="text-sm text-gray-700 dark:text-slate-300 cursor-pointer">
           Saya telah memeriksa kesesuaian metadata dan file scan final.
@@ -110,7 +106,7 @@ export function AdminArchivePanel({
 
       <button
         onClick={handleArchive}
-        disabled={loading || !hasScanFile || !confirmed}
+        disabled={loading || !confirmed}
         className="btn-primary w-full justify-center py-2.5 bg-teal-700 hover:bg-teal-800"
       >
         {loading ? (

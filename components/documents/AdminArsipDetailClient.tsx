@@ -2,10 +2,10 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { format } from "date-fns";
 import { id as localeId } from "date-fns/locale";
-import { ArrowLeft, FileText, Download, Calendar, User, Printer, Eye, Pencil, Trash2 } from "lucide-react";
+import { ArrowLeft, FileText, Download, Calendar, User, Printer, Eye, Pencil, Trash2, Clock, Users, MessageCircle } from "lucide-react";
 import toast from "react-hot-toast";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { StatusTimeline } from "@/components/documents/StatusTimeline";
@@ -28,8 +28,14 @@ export default function AdminArsipDetailClient({ doc, staffUsers }: {
   const scanFiles = doc.files.filter((f) => f.fileType === "FINAL_SCAN");
 
   const router = useRouter();
+  const pathname = usePathname();
   const [showEditModal, setShowEditModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  // Tentukan back url yang sesuai
+  const backUrl = pathname.includes("/dokumen") 
+    ? "/dashboard/admin/dokumen" 
+    : "/dashboard/admin/arsip";
 
   const handleDelete = async () => {
     if (!confirm("Apakah Anda yakin ingin menghapus dokumen ini secara permanen? Aksi ini tidak dapat dibatalkan.")) return;
@@ -39,7 +45,7 @@ export default function AdminArsipDetailClient({ doc, staffUsers }: {
       const json = await res.json();
       if (!res.ok) throw new Error(json.error ?? "Gagal menghapus dokumen");
       toast.success("Dokumen berhasil dihapus!");
-      router.push("/dashboard/admin");
+      router.push(backUrl);
     } catch (error: any) {
       toast.error(error.message);
       setIsDeleting(false);
@@ -50,7 +56,7 @@ export default function AdminArsipDetailClient({ doc, staffUsers }: {
     <div className="max-w-4xl mx-auto space-y-6">
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <Link href="/dashboard/admin/arsip" className="p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg">
+          <Link href={backUrl} className="p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg">
             <ArrowLeft className="w-5 h-5 text-gray-600 dark:text-slate-400" />
           </Link>
           <div>
@@ -102,6 +108,52 @@ export default function AdminArsipDetailClient({ doc, staffUsers }: {
             )}
           </div>
 
+          {/* Undangan Info & GCal Button */}
+          {doc.undangan && (
+            <div className="card p-5 space-y-4 bg-indigo-50/50 dark:bg-indigo-900/10 border-indigo-100 dark:border-indigo-800/50">
+              <h3 className="text-sm font-bold text-indigo-900 dark:text-indigo-200 flex items-center gap-2">
+                <Calendar className="w-4 h-4" /> Detail Undangan
+              </h3>
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <InfoRow icon={Calendar} label="Jadwal" value={`${doc.undangan.hari}, ${format(new Date(doc.undangan.tanggal), "dd MMMM yyyy", { locale: localeId })}`} />
+                <InfoRow icon={Clock} label="Jam" value={doc.undangan.jam} />
+                <InfoRow icon={FileText} label="Tempat" value={doc.undangan.tempat} />
+                <InfoRow icon={Users} label="Media" value={doc.undangan.media} />
+              </div>
+              
+              <div className="flex gap-2 pt-2 border-t border-indigo-100 dark:border-indigo-800/50">
+                <a 
+                  href={`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(doc.perihal || "")}&details=${encodeURIComponent("Terkait surat: " + doc.nomorSurat)}&location=${encodeURIComponent(doc.undangan.tempat)}&dates=${format(new Date(doc.undangan.tanggal), "yyyyMMdd")}T010000Z/${format(new Date(doc.undangan.tanggal), "yyyyMMdd")}T030000Z${doc.undangan.penerima?.length ? `&add=${encodeURIComponent(doc.undangan.penerima.map((p: any) => p.user?.email).filter(Boolean).join(","))}` : ""}`}
+                  target="_blank" 
+                  rel="noreferrer" 
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-slate-800 border border-indigo-200 dark:border-indigo-700 hover:bg-indigo-50 dark:hover:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 rounded-lg text-xs font-medium transition-colors"
+                >
+                  <Calendar className="w-3.5 h-3.5" /> Tambahkan ke Google Calendar
+                </a>
+                <a 
+                  href={`https://wa.me/?text=${encodeURIComponent(
+                    `🔔 *PEMBERITAHUAN JADWAL KEGIATAN* 🔔\n\n` +
+                    `Yth. Bapak/Ibu,\n` +
+                    `Mengingatkan bahwa terdapat agenda kegiatan yang perlu dihadiri:\n\n` +
+                    `📌 *Agenda:*\n${doc.perihal || ""}\n\n` +
+                    `✉️ *Terkait Surat:*\n${doc.nomorSurat}\n\n` +
+                    `🗓️ *Waktu Pelaksanaan:*\n` +
+                    `• Hari, Tanggal: ${doc.undangan.hari}, ${format(new Date(doc.undangan.tanggal), 'dd MMMM yyyy', { locale: localeId })}\n` +
+                    `• Pukul: ${doc.undangan.jam} WIB\n\n` +
+                    `📍 *Lokasi/Media:*\n${doc.undangan.tempat} (${doc.undangan.media})\n\n` +
+                    `📝 *Pakaian/Dresscode:*\n${doc.undangan.dresscode ? doc.undangan.dresscode : '-'}\n\n` +
+                    `Dimohon kehadirannya tepat waktu.\nTerima kasih. 🙏`
+                  )}`}
+                  target="_blank" 
+                  rel="noreferrer" 
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-slate-800 border border-emerald-200 dark:border-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 rounded-lg text-xs font-medium transition-colors"
+                >
+                  <MessageCircle className="w-3.5 h-3.5" /> Share WhatsApp
+                </a>
+              </div>
+            </div>
+          )}
+
           {/* Keputusan Direktur */}
           {latestDecision && (
             <div className="card p-4 bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark:border-purple-800 space-y-2">
@@ -132,8 +184,10 @@ export default function AdminArsipDetailClient({ doc, staffUsers }: {
             emptyMessage="Belum ada file scan final. Pastikan Staff sudah mengupload scan." 
           />
 
-          {/* Lembar Disposisi (tampil setelah Direktur memberikan keputusan) */}
-          {doc.currentStatus === "KEPUTUSAN_DIREKTUR_SELESAI" && latestDisposisi && (
+          {/* Lembar Disposisi (tampil setelah Direktur memberikan keputusan, HANYA untuk SURAT_MASUK) */}
+          {["KEPUTUSAN_DIREKTUR_SELESAI", "ARSIP_FINAL_TERSIMPAN"].includes(doc.currentStatus) && 
+           doc.documentType === "SURAT_MASUK" && 
+           latestDisposisi && (
             <DisposisiViewer
               disposisi={latestDisposisi}
               doc={doc}
