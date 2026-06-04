@@ -1,3 +1,8 @@
+/**
+ * @file app/page.tsx
+ * @description Halaman utama (Landing Page) aplikasi SIPAS PDAM. Berisi informasi singkat sistem dan tombol untuk masuk ke halaman login.
+ * @location Ditampilkan saat pengguna mengunjungi URL utama ("/") sebelum login.
+ */
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Droplets, ShieldCheck, Activity } from "lucide-react";

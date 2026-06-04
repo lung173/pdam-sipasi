@@ -1,9 +1,8 @@
 /**
  * @file components/documents/StatusTimeline.tsx
- * @description Komponen UI untuk menampilkan riwayat status dokumen secara vertikal.
- * Memberikan visualisasi urutan proses yang telah dilalui dokumen beserta catatan dari setiap tahap.
+ * @description Komponen UI untuk menampilkan riwayat status dokumen secara vertikal (seperti timeline feed).
+ * @location Dirender di panel detail dokumen semua role untuk menunjukkan alur riwayat dokumen (dari DRAFT hingga SELESAI/ARSIP).
  */
-// components/documents/StatusTimeline.tsx
 import { format } from "date-fns";
 import { id as localeId } from "date-fns/locale";
 import { DocumentStatus } from "@prisma/client";

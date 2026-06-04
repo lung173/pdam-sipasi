@@ -1,3 +1,8 @@
+/**
+ * @file components/documents/PrintButton.tsx
+ * @description Komponen tombol pintasan untuk memicu fitur `window.print()` (cetak halaman ke PDF/Printer fisik).
+ * @location Dipanggil di halaman-halaman laporan atau lembar disposisi yang perlu dicetak.
+ */
 "use client";
 
 export function PrintButton() {

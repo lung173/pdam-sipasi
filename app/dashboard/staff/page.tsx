@@ -1,4 +1,9 @@
 // app/dashboard/staff/page.tsx
+/**
+ * @file app/dashboard/staff/page.tsx
+ * @description Dashboard utama untuk role ADMIN_STAFF (Staff). Menampilkan status pengajuan surat, draft, dan log aktivitas pribadi.
+ * @location Ditampilkan pada URL "/dashboard/staff".
+ */
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 import { redirect } from "next/navigation";

@@ -1,4 +1,9 @@
 // components/kalender/KalenderInternal.tsx
+/**
+ * @file components/kalender/KalenderInternal.tsx
+ * @description Komponen kalender interaktif (menggunakan FullCalendar) untuk menampilkan daftar agenda atau surat undangan yang harus dihadiri.
+ * @location Dirender pada menu/halaman "Kalender" di dashboard (khususnya untuk Direktur dan Kabag).
+ */
 "use client";
 
 import { useState, useEffect, useCallback } from "react";

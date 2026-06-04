@@ -1,4 +1,9 @@
 // components/documents/StaffActionPanel.tsx
+/**
+ * @file components/documents/StaffActionPanel.tsx
+ * @description Komponen aksi bagi admin staff untuk melacak dokumen yang diajukannya atau meneruskan draft kepada Agendaris.
+ * @location Dirender di halaman detail dokumen milik staf ("/dashboard/staff/dokumen/[id]").
+ */
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";

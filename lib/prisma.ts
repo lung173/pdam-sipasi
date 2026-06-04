@@ -5,6 +5,11 @@
  * untuk efisiensi koneksi di lingkungan serverless/edge.
  */
 // lib/prisma.ts
+/**
+ * @file lib/prisma.ts
+ * @description Konfigurasi inisialisasi instance Prisma Client untuk koneksi ke database. Mencegah koneksi ganda (multiple connections) saat pengembangan (development).
+ * @location Di-import oleh file API routes dan utilitas yang membutuhkan akses database.
+ */
 import { PrismaClient } from "@prisma/client";
 import { Pool } from "pg";
 import { PrismaPg } from "@prisma/adapter-pg";

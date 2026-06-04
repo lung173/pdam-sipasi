@@ -1,4 +1,9 @@
 // components/admin/UserManagementClient.tsx
+/**
+ * @file components/admin/UserManagementClient.tsx
+ * @description Komponen klien utama untuk manajemen pengguna (CRUD Data User). Meliputi tabel user, filter role, form penambahan, serta penghapusan akun.
+ * @location Dirender di halaman manajemen pengguna ("/dashboard/admin/users") - akses khusus Admin.
+ */
 "use client";
 import { useState } from "react";
 import { format } from "date-fns";

@@ -1,4 +1,9 @@
 // lib/utils.ts
+/**
+ * @file lib/utils.ts
+ * @description Kumpulan fungsi utilitas (helper functions) yang digunakan di seluruh aplikasi, misalnya classnames merger untuk TailwindCSS.
+ * @location Di-import oleh berbagai komponen (terutama di direktori `components/ui`).
+ */
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 

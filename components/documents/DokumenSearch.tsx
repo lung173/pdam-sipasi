@@ -1,4 +1,9 @@
 // components/documents/DokumenSearch.tsx
+/**
+ * @file components/documents/DokumenSearch.tsx
+ * @description Komponen form input untuk melakukan pencarian dokumen. Biasanya terhubung dengan query string URL.
+ * @location Dirender di halaman tabel dokumen untuk memfasilitasi pencarian (misal: di Admin Archive).
+ */
 "use client";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useState } from "react";

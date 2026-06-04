@@ -1,4 +1,9 @@
 // components/layout/Sidebar.tsx
+/**
+ * @file components/layout/Sidebar.tsx
+ * @description Komponen navigasi menu di sisi kiri layar. Link yang ditampilkan menyesuaikan dengan role user yang sedang login.
+ * @location Dirender di dalam `DashboardShell.tsx`.
+ */
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -51,7 +56,7 @@ const navByRole: Record<UserRole, NavEntry[]> = {
         // { label: "Peraturan Direktur", href: "/dashboard/admin/peraturan", icon: ScrollText },
       ],
     },
-    { label: "Pusat Dokumen", href: "/dashboard/admin/dokumen", icon: BookOpen },
+    { label: "Progres Disposisi", href: "/dashboard/admin/dokumen", icon: BookOpen },
     { label: "Arsip", href: "/dashboard/admin/arsip", icon: Archive },
     { label: "Kelola Pengguna", href: "/dashboard/admin/users", icon: Users },
     { label: "Audit Log", href: "/dashboard/admin/audit", icon: Activity },

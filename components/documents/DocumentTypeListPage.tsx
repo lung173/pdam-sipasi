@@ -1,4 +1,9 @@
 // components/documents/DocumentTypeListPage.tsx
+/**
+ * @file components/documents/DocumentTypeListPage.tsx
+ * @description Komponen halaman (template) untuk menampilkan daftar dokumen berdasarkan jenis/kategori (Peraturan, Perjanjian, Surat Masuk, dll).
+ * @location Dirender secara spesifik oleh halaman list dokumen kategori di Dashboard Admin.
+ */
 "use client";
 
 import { useState, useEffect, useCallback } from "react";

@@ -1,6 +1,7 @@
 /**
  * @file components/layout/ThemeToggle.tsx
  * @description Tombol toggle untuk beralih antara Dark Mode dan Light Mode.
+ * @location Dirender di dalam `TopBar.tsx`.
  */
 "use client";
 

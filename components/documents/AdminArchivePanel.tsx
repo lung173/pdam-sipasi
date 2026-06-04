@@ -1,4 +1,9 @@
 // components/documents/AdminArchivePanel.tsx
+/**
+ * @file components/documents/AdminArchivePanel.tsx
+ * @description Komponen panel kontrol khusus Admin/Agendaris untuk melakukan pengarsipan dokumen fisik dan digital ke dalam sistem.
+ * @location Dirender di halaman detail dokumen pada role Admin (misal: "/dashboard/admin/arsip/[id]").
+ */
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";

@@ -1,4 +1,8 @@
-// app/login/page.tsx
+/**
+ * @file app/login/page.tsx
+ * @description Halaman autentikasi untuk masuk ke dalam sistem. Menggunakan NextAuth Credentials provider untuk memverifikasi email dan password pengguna.
+ * @location Ditampilkan pada URL "/login".
+ */
 "use client";
 import { useState } from "react";
 import { signIn } from "next-auth/react";

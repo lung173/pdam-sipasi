@@ -1,4 +1,9 @@
 // components/documents/DocumentPreview.tsx
+/**
+ * @file components/documents/DocumentPreview.tsx
+ * @description Komponen UI (modal/embed) untuk menampilkan preview dokumen digital (misal PDF atau gambar) langsung di dalam aplikasi.
+ * @location Dipanggil ketika user menekan tombol "Lihat Dokumen" di tabel atau detail dokumen.
+ */
 "use client";
 import { X, ExternalLink, Download, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";

@@ -1,8 +1,7 @@
 /**
  * @file components/documents/FileUpload.tsx
- * @description Komponen UI untuk menangani unggahan file dokumen.
- * Mendukung drag-and-drop, validasi sisi client, dan progres unggahan 
- * untuk file draft maupun scan final.
+ * @description Komponen UI untuk menangani unggahan file dokumen (PDF/JPG/PNG) via drag-and-drop.
+ * @location Dipanggil saat form pembuatan dokumen baru atau form upload lampiran final.
  */
 // components/documents/FileUpload.tsx
 "use client";

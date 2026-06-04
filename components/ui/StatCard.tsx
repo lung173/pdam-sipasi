@@ -1,4 +1,9 @@
 // components/ui/StatCard.tsx
+/**
+ * @file components/ui/StatCard.tsx
+ * @description Komponen UI kartu statistik untuk menampilkan angka penting (misal: jumlah dokumen aktif).
+ * @location Biasanya dipanggil di halaman beranda dashboard setiap role (Dashboard Admin, Direktur, dll).
+ */
 import { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 

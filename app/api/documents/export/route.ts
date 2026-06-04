@@ -72,10 +72,13 @@ export async function GET(req: NextRequest) {
         "NO. AGENDA",
         "TGL. TERIMA",
         "ASAL SURAT",
-        "PERIHAL",
-        "KETERANGAN"
+        "PERIHAL"
       ];
-      
+
+      if (documentType !== "SURAT_MASUK") {
+        headers.push("KETERANGAN");
+      }
+
       const headerRow = worksheet.addRow(headers);
       headerRow.font = { bold: true };
       headerRow.alignment = { vertical: 'middle', horizontal: 'center' };
@@ -115,16 +118,21 @@ export async function GET(req: NextRequest) {
            keterangan = ketLines.join("\n");
         }
 
-        const row = worksheet.addRow([
+        const rowValues = [
           index + 1,
           doc.nomorSurat,
           format(new Date(doc.tanggalSurat), "dd MMM yyyy", { locale: localeId }),
           doc.nomorAgenda || "-",
           format(new Date(doc.tanggalTerima), "dd MMM yyyy", { locale: localeId }),
           doc.asalSurat || "-",
-          doc.perihal,
-          keterangan
-        ]);
+          doc.perihal
+        ];
+
+        if (documentType !== "SURAT_MASUK") {
+          rowValues.push(keterangan);
+        }
+
+        const row = worksheet.addRow(rowValues);
 
         row.alignment = { vertical: 'top', wrapText: true };
         row.eachCell((cell) => {
@@ -145,7 +153,10 @@ export async function GET(req: NextRequest) {
       worksheet.getColumn(5).width = 15; // TGL. TERIMA
       worksheet.getColumn(6).width = 25; // ASAL SURAT
       worksheet.getColumn(7).width = 40; // PERIHAL
-      worksheet.getColumn(8).width = 40; // KETERANGAN
+
+      if (documentType !== "SURAT_MASUK") {
+        worksheet.getColumn(8).width = 50; // KETERANGAN
+      }
 
       const buffer = await workbook.xlsx.writeBuffer();
       const filename = `Laporan_Dokumen_${format(new Date(), "yyyyMMdd_HHmmss")}.xlsx`;

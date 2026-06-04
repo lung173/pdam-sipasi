@@ -1,4 +1,9 @@
 // components/documents/ArsipFilter.tsx
+/**
+ * @file components/documents/ArsipFilter.tsx
+ * @description Komponen UI untuk filter pencarian dan pengurutan (sorting) daftar arsip di tabel.
+ * @location Dirender di halaman daftar arsip ("/dashboard/admin/arsip").
+ */
 "use client";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback } from "react";

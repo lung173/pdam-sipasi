@@ -1,7 +1,7 @@
 /**
  * @file app/dashboard/kabag/page.tsx
- * @description Dashboard utama untuk role Kepala Bagian (KABAG).
- * Menampilkan daftar disposisi masuk dari Direktur dan ringkasan status dokumen terkait.
+ * @description Dashboard utama untuk role Kepala Bagian (KABAG). Menampilkan daftar disposisi masuk dari Direktur dan ringkasan status dokumen terkait.
+ * @location Ditampilkan pada URL "/dashboard/kabag".
  */
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";

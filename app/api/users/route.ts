@@ -1,4 +1,9 @@
 // app/api/users/route.ts
+/**
+ * @file app/api/users/route.ts
+ * @description Route API untuk manajemen pengguna (CRUD Data User). Mengizinkan Admin untuk mengambil, menambah, atau memodifikasi pengguna.
+ * @location Diakses via HTTP GET/POST di endpoint `/api/users`.
+ */
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { UserRole } from "@prisma/client";

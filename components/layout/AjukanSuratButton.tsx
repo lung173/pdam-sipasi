@@ -1,4 +1,9 @@
 // components/layout/AjukanSuratButton.tsx
+/**
+ * @file components/layout/AjukanSuratButton.tsx
+ * @description Komponen tombol untuk memicu modal pengajuan surat baru. Biasanya ditampilkan di TopBar atau Sidebar untuk akses cepat.
+ * @location Dirender di Sidebar dan/atau halaman yang butuh akses cepat (terutama untuk Staff).
+ */
 "use client";
 import { useState } from "react";
 import { Send } from "lucide-react";

@@ -1,4 +1,9 @@
 // app/dashboard/admin/page.tsx
+/**
+ * @file app/dashboard/admin/page.tsx
+ * @description Dashboard utama untuk role AGENDARIS (Admin/Agendaris). Menampilkan ringkasan data dokumen, tugas aktif, dan metrik sistem.
+ * @location Ditampilkan pada URL "/dashboard/admin".
+ */
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 import { redirect } from "next/navigation";
@@ -21,7 +26,7 @@ export default async function AdminDashboard() {
 
   const [
     totalDokumen, totalUser, menungguArsip, arsipFinal,
-    menungguKeputusan, jadwalTerdekat, docPerStatus,
+    menungguKeputusan, keputusanSelesai, jadwalTerdekat, docPerStatus, 
   ] = await Promise.all([
     prisma.suratMasuk.count(),
     prisma.user.count({ where: { isActive: true } }),
@@ -29,6 +34,12 @@ export default async function AdminDashboard() {
     prisma.suratMasuk.count({ where: { currentStatus: "ARSIP_FINAL_TERSIMPAN" } }),
     prisma.suratMasuk.findMany({
       where: { currentStatus: { in: ["MENUNGGU_KEPUTUSAN_DIREKTUR", "DIPROSES_DIREKTUR"] } },
+      include: { createdBy: { select: { name: true, divisi: true } } },
+      orderBy: { updatedAt: "desc" },
+      take: 5,
+    }),
+    prisma.suratMasuk.findMany({
+      where: { currentStatus: { in: ["KEPUTUSAN_DIREKTUR_SELESAI", "PERLU_REVISI"] } },
       include: { createdBy: { select: { name: true, divisi: true } } },
       orderBy: { updatedAt: "desc" },
       take: 5,
@@ -98,7 +109,7 @@ export default async function AdminDashboard() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Menunggu Keputusan Direktur */}
         <div className="card flex flex-col h-full">
           <div className="px-5 py-4 border-b border-gray-100 dark:border-slate-800 flex items-center justify-between">
@@ -125,6 +136,37 @@ export default async function AdminDashboard() {
                   <Link href={`/dashboard/admin/dokumen/${doc.id}`}
                     className="p-1.5 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded text-blue-600 dark:text-blue-400 hover:text-blue-700 font-medium text-xs flex items-center gap-1">
                     Cek <ArrowRight className="w-3 h-3" />
+                  </Link>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Hasil Keputusan Direktur */}
+        <div className="card flex flex-col h-full border-green-100 dark:border-green-900/30">
+          <div className="px-5 py-4 border-b border-gray-100 dark:border-slate-800 flex items-center justify-between bg-green-50/50 dark:bg-green-950/10 rounded-t-xl">
+            <h2 className="font-semibold text-green-900 dark:text-green-300">Hasil Keputusan Direktur</h2>
+            <span className="text-[10px] bg-green-100 text-green-800 px-2 py-0.5 rounded-full font-bold dark:bg-green-900 dark:text-green-200">Terbaru</span>
+          </div>
+          {keputusanSelesai.length === 0 ? (
+            <div className="p-6 text-center text-sm text-gray-400 dark:text-slate-500 flex-grow flex items-center justify-center">
+              Belum ada keputusan baru dari Direktur.
+            </div>
+          ) : (
+            <div className="divide-y divide-gray-100 dark:divide-slate-800 flex-grow">
+              {keputusanSelesai.map((doc) => (
+                <div key={doc.id} className="flex items-center gap-4 px-5 py-3 hover:bg-gray-50 dark:hover:bg-slate-800/50">
+                  <div className="flex-1 min-w-0">
+                    <p className="font-mono text-xs text-green-700 dark:text-green-400">{doc.nomorSurat || "Tanpa Nomor"}</p>
+                    <p className="text-sm text-gray-800 dark:text-slate-200 truncate font-medium">{doc.perihal}</p>
+                    <p className="text-xs text-gray-500 mt-0.5">
+                      <StatusBadge status={doc.currentStatus} size="sm" />
+                    </p>
+                  </div>
+                  <Link href={`/dashboard/admin/dokumen/${doc.id}`}
+                    className="p-1.5 hover:bg-green-50 dark:hover:bg-green-900/30 rounded text-green-600 dark:text-green-400 hover:text-green-700 font-medium text-xs flex items-center gap-1">
+                    Detail <ArrowRight className="w-3 h-3 text-green-600" />
                   </Link>
                 </div>
               ))}

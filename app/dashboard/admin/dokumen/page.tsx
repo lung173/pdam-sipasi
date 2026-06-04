@@ -37,7 +37,10 @@ export default async function AdminSemuaDokumenPage(props: Params) {
   const page = Math.max(1, parseInt(searchParams.page ?? "1") || 1);
   const activeType = searchParams.type ?? "SEMUA";
 
-  const where: Prisma.SuratMasukWhereInput = {};
+  const where: Prisma.SuratMasukWhereInput = {
+    currentStatus: { not: "ARSIP_FINAL_TERSIMPAN" }
+  };
+
 
   // Filter by document type
   const activeTab = TABS.find((t) => t.key === activeType);

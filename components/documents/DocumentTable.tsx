@@ -1,4 +1,9 @@
 // components/documents/DocumentTable.tsx
+/**
+ * @file components/documents/DocumentTable.tsx
+ * @description Komponen tabel reusable untuk menampilkan daftar dokumen. Mendukung pengurutan, penampilan status, dan navigasi ke halaman detail.
+ * @location Dirender di berbagai halaman yang menampilkan list dokumen (misal: "/dashboard/staff", "/dashboard/direktur").
+ */
 "use client";
 import Link from "next/link";
 import { format } from "date-fns";

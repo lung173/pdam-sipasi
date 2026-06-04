@@ -1,4 +1,9 @@
 // components/ui/StatusBadge.tsx
+/**
+ * @file components/ui/StatusBadge.tsx
+ * @description Komponen UI berupa badge warna-warni untuk merepresentasikan status dokumen (misal: DRAFT, DIPROSES, SELESAI).
+ * @location Dipanggil di tabel-tabel atau detail dokumen untuk memperjelas status visual dokumen.
+ */
 import { DocumentStatus } from "@prisma/client";
 import { STATUS_LABELS, STATUS_COLORS } from "@/types";
 import { cn } from "@/lib/utils";

@@ -1,4 +1,9 @@
 // components/ui/SignaturePad.tsx
+/**
+ * @file components/ui/SignaturePad.tsx
+ * @description Komponen kanvas untuk mengambil input tanda tangan pengguna.
+ * @location Dirender di form pengesahan dokumen, misalnya saat pimpinan (Direktur) memberikan persetujuan dengan tanda tangan.
+ */
 "use client";
 import React, { useRef, useState, useEffect } from 'react';
 import { Trash2, Check, Download, MousePointer2, Pencil } from 'lucide-react';

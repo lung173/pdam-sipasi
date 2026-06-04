@@ -1,4 +1,9 @@
 // app/dashboard/profil/page.tsx
+/**
+ * @file app/dashboard/profil/page.tsx
+ * @description Halaman pengaturan profil pengguna. Memungkinkan pengguna mengubah informasi pribadi dan password.
+ * @location Ditampilkan pada URL "/dashboard/profil".
+ */
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";

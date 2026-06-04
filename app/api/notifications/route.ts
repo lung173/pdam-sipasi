@@ -1,4 +1,9 @@
 // app/api/notifications/route.ts
+/**
+ * @file app/api/notifications/route.ts
+ * @description Route API untuk mengambil daftar notifikasi pengguna yang sedang login.
+ * @location Diakses via HTTP GET di endpoint `/api/notifications`.
+ */
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAuth, successResponse, errorResponse } from "@/lib/auth-helpers";

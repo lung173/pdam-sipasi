@@ -1,3 +1,8 @@
+/**
+ * @file app/verify/[id]/page.tsx
+ * @description Halaman publik untuk memverifikasi keaslian suatu dokumen persuratan berdasarkan ID-nya. Menampilkan status persetujuan dan tanda tangan digital.
+ * @location Ditampilkan pada URL "/verify/[id]". Biasanya diakses melalui QR Code pada dokumen fisik yang dicetak.
+ */
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { format } from "date-fns";

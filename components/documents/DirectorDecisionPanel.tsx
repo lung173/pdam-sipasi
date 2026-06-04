@@ -1,4 +1,9 @@
 // components/documents/DirectorDecisionPanel.tsx
+/**
+ * @file components/documents/DirectorDecisionPanel.tsx
+ * @description Komponen panel bagi Direktur untuk memberikan keputusan (Setuju/Tolak) pada suatu dokumen beserta input tanda tangan digital.
+ * @location Dirender di halaman review dokumen Direktur ("/dashboard/direktur/review/[id]").
+ */
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";

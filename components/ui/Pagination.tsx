@@ -1,3 +1,8 @@
+/**
+ * @file components/ui/Pagination.tsx
+ * @description Komponen UI untuk navigasi paginasi tabel/list, menangani perpindahan halaman data dengan mengubah URL search params (query string).
+ * @location Dipanggil di halaman-halaman yang membutuhkan tabel data dalam jumlah banyak, contoh: halaman Arsip Admin.
+ */
 "use client";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ChevronLeft, ChevronRight } from "lucide-react";

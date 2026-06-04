@@ -1,4 +1,9 @@
 // app/dashboard/layout.tsx
+/**
+ * @file app/dashboard/layout.tsx
+ * @description Layout untuk halaman dashboard. Menampilkan sidebar, topbar, dan membungkus halaman-halaman dashboard lainnya.
+ * @location Dirender di semua halaman yang berada di dalam "/dashboard".
+ */
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 import { redirect } from "next/navigation";

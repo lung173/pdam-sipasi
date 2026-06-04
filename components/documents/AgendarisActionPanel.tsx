@@ -1,4 +1,9 @@
 // components/documents/AgendarisActionPanel.tsx
+/**
+ * @file components/documents/AgendarisActionPanel.tsx
+ * @description Komponen aksi bagi Agendaris untuk memproses dokumen (menerima, menolak, meneruskan ke Direktur).
+ * @location Dirender di halaman detail inbox agendaris ("/dashboard/admin/inbox/[id]").
+ */
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -173,8 +178,9 @@ export function AgendarisActionPanel({
 
   const submitDisposisi = async () => {
     if (mode === "disposisi_undangan") {
-      if (!uHari || !uTanggalMulai || !uTanggalSelesai || !uJam || !uTempat) {
-        toast.error("Harap isi semua kolom wajib acara undangan (Hari, Tanggal Mulai/Selesai, Jam, Tempat).");
+      const isTempatInvalid = uMedia === "OFFLINE" && !uTempat;
+      if (!uHari || !uTanggalMulai || !uTanggalSelesai || !uJam || isTempatInvalid) {
+        toast.error(`Harap isi semua kolom wajib acara undangan (Hari, Tanggal Mulai/Selesai, Jam${uMedia === "OFFLINE" ? ", Tempat" : ""}).`);
         return;
       }
     }
@@ -510,7 +516,7 @@ export function AgendarisActionPanel({
               {mode === "disposisi_undangan" && (
                 <div className="bg-purple-50/50 dark:bg-purple-950/10 p-4 border-b-2 border-gray-400 dark:border-slate-700 space-y-4 text-xs">
                   <h4 className="font-bold text-purple-950 dark:text-purple-300 text-xs flex items-center gap-1.5 uppercase tracking-wider">
-                    <span>📅</span> Form Acara Undangan
+                    Form Acara Undangan
                   </h4>
                   
                   {/* Hari, Jam & Media */}
@@ -540,8 +546,8 @@ export function AgendarisActionPanel({
                         value={uMedia}
                         onChange={(e) => setUMedia(e.target.value as any)}
                       >
-                        <option value="OFFLINE">OFFLINE (📍)</option>
-                        <option value="ONLINE">ONLINE (🎥)</option>
+                        <option value="OFFLINE">OFFLINE</option>
+                        <option value="ONLINE">ONLINE</option>
                       </select>
                     </div>
                   </div>
@@ -571,7 +577,9 @@ export function AgendarisActionPanel({
                   {/* Tempat & Dresscode */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-[10px] font-bold text-gray-700 dark:text-slate-400 uppercase mb-1">Tempat / Ruangan</label>
+                      <label className="block text-[10px] font-bold text-gray-700 dark:text-slate-400 uppercase mb-1">
+                        Tempat / Ruangan {uMedia === "OFFLINE" && <span className="text-red-500">*</span>}
+                      </label>
                       <input
                         className="form-input text-xs py-1"
                         placeholder="Contoh: Ruang Rapat Utama"
@@ -640,7 +648,7 @@ export function AgendarisActionPanel({
                         Tanggal Instruksi :
                       </p>
                       <div className="form-input text-xs bg-amber-50 text-amber-600 cursor-not-allowed border-dashed border-amber-300">
-                        ⚠️ Wajib diisi oleh Direktur
+                        Wajib diisi oleh Direktur
                       </div>
                     </div>
                     <div>

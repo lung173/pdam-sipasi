@@ -1,7 +1,7 @@
 /**
  * @file app/dashboard/page.tsx
- * @description Halaman pengalihan (redirect) utama dashboard.
- * Berfungsi untuk mengarahkan user ke halaman dashboard yang sesuai berdasarkan role masing-masing setelah login.
+ * @description Halaman pengalihan (redirect) utama dashboard. Berfungsi untuk mengarahkan user ke halaman dashboard yang sesuai berdasarkan role masing-masing setelah login.
+ * @location Ditampilkan pada URL "/dashboard".
  */
 // app/dashboard/page.tsx
 import { getServerSession } from "next-auth";

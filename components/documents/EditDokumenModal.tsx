@@ -1,3 +1,8 @@
+/**
+ * @file components/documents/EditDokumenModal.tsx
+ * @description Komponen modal untuk mengedit data dokumen (metadata seperti perihal, deskripsi, dll) yang sudah ada di sistem.
+ * @location Dirender di halaman detail dokumen bagi user yang memiliki akses edit (seperti Admin atau pengirim awal).
+ */
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -46,7 +51,9 @@ export function EditDokumenModal({ doc, onClose }: { doc: any; onClose: () => vo
       if (!undangan.hari) newErrors.undanganHari = "Hari kegiatan wajib dipilih.";
       if (!undangan.jam) newErrors.undanganJam = "Jam kegiatan wajib diisi.";
       if (!undangan.tanggal) newErrors.undanganTanggal = "Tanggal kegiatan wajib diisi.";
-      if (!undangan.tempat.trim()) newErrors.undanganTempat = "Tempat kegiatan wajib diisi.";
+      if (undangan.media === "OFFLINE" && !undangan.tempat.trim()) {
+        newErrors.undanganTempat = "Tempat kegiatan wajib diisi untuk media luring.";
+      }
       if (undangan.media === "ONLINE" && !undangan.detailMedia.trim()) {
         newErrors.undanganDetailMedia = "Detail media wajib diisi jika daring.";
       }
@@ -214,7 +221,9 @@ export function EditDokumenModal({ doc, onClose }: { doc: any; onClose: () => vo
               </div>
 
               <div>
-                <label className="form-label">Tempat <span className="text-red-500">*</span></label>
+                <label className="form-label font-semibold text-gray-700 mb-1 block">
+                  Tempat {undangan.media === "OFFLINE" && <span className="text-red-500">*</span>}
+                </label>
                 <input
                   className="form-input"
                   value={undangan.tempat}

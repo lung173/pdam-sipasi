@@ -1,3 +1,8 @@
+/**
+ * @file components/documents/DisposisiViewer.tsx
+ * @description Komponen untuk menampilkan daftar atau riwayat disposisi (perjalanan dokumen) beserta instruksi yang diberikan pada suatu dokumen.
+ * @location Dirender di berbagai halaman detail dokumen bagi user yang terkait (Admin, Kabag, dll).
+ */
 import { format } from "date-fns";
 import { id as localeId } from "date-fns/locale";
 import { GitBranch } from "lucide-react";
@@ -160,24 +165,18 @@ export function DisposisiViewer({ disposisi, doc, actions }: DisposisiViewerProp
                 <p className="font-extrabold text-gray-800 mb-2.5 text-xs uppercase tracking-wide">
                   Tanggal Penyelesaian :
                 </p>
-                <div className="border-b border-dotted border-gray-500 pb-1 font-bold text-sm text-blue-600 min-h-[1.5rem]">
+                <div className="border-gray-500 pb-1 font-bold text-sm text-blue-600 min-h-[1.5rem]">
                   {fmtDate(disposisi.tanggalPenyelesaian || disposisi.tanggalTandaTangan)}
                 </div>
               </div>
 
               {/* Catatan value */}
               {disposisi.keterangan ? (
-                <p className="text-sm font-bold text-blue-600 border-b border-dotted border-gray-500 pb-2 mb-4">
+                <p className="text-sm font-bold text-blue-600 border-gray-500 pb-2 mb-4">
                   {disposisi.keterangan}
                 </p>
               ) : null}
 
-              {/* Guidelines */}
-              <div className="flex flex-col gap-6">
-                {Array.from({ length: disposisi.keterangan ? 4 : 6 }).map((_, i) => (
-                  <div key={i} className="border-b border-dotted border-gray-400 h-2 w-full" />
-                ))}
-              </div>
             </div>
           </div>
         </div>

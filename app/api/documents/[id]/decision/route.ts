@@ -100,7 +100,7 @@ export async function POST(req: NextRequest, props: Params) {
           auditExtraDescription = " (Peringatan: Gagal TTD, tidak ada file Draft PDF)";
         }
       } else if (decisionType === "REVISI" || decisionType === "DITOLAK") {
-         nextStatus = "REVISI_DARI_DIREKTUR";
+         nextStatus = "PERLU_REVISI";
       }
 
       // Jika batalTandaTangan, tambahkan catatan

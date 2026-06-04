@@ -1,3 +1,8 @@
+/**
+ * @file components/layout/DashboardShell.tsx
+ * @description Komponen shell (kerangka utama) untuk layout dashboard. Membungkus konten utama (children) bersama dengan Sidebar dan TopBar, serta mengurus state buka-tutup sidebar di tampilan mobile.
+ * @location Dipanggil di `app/dashboard/layout.tsx`.
+ */
 "use client";
 import { useState } from "react";
 import { usePathname } from "next/navigation";

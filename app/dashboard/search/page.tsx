@@ -1,6 +1,7 @@
 /**
  * @file app/dashboard/search/page.tsx
  * @description Halaman pencarian global untuk menemukan dokumen di seluruh sistem tanpa batasan status.
+ * @location Ditampilkan pada URL "/dashboard/search".
  */
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";

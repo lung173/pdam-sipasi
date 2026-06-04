@@ -1,4 +1,9 @@
 // components/layout/TopBar.tsx
+/**
+ * @file components/layout/TopBar.tsx
+ * @description Komponen header atas (TopBar). Menampilkan nama user yang sedang login, tombol toggle sidebar (mobile), tombol logout, dan toggle tema (Dark/Light Mode).
+ * @location Dirender di dalam `DashboardShell.tsx`.
+ */
 "use client";
 import { useState, useRef, useEffect } from "react";
 import { Bell, ChevronDown, Menu, LogOut, UserCog, CalendarDays, ExternalLink, Info, AlertCircle, CheckCircle2, Search } from "lucide-react";

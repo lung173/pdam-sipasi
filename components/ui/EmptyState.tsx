@@ -1,4 +1,9 @@
 // components/ui/EmptyState.tsx
+/**
+ * @file components/ui/EmptyState.tsx
+ * @description Komponen UI untuk menampilkan status kosong ketika tidak ada data atau belum ada interaksi, misalnya ketika pencarian tidak membuahkan hasil.
+ * @location Dipanggil di berbagai halaman list/tabel seperti halaman arsip, daftar dokumen, dll.
+ */
 import { LucideIcon, FileX } from "lucide-react";
 
 interface Props {

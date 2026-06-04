@@ -1,9 +1,7 @@
 /**
  * @file app/api/documents/route.ts
- * @description Handler untuk rute API dokumen (koleksi).
- * Mendukung pengambilan daftar dokumen (GET) dengan filter documentType dan paginasi, 
- * serta pembuatan dokumen baru (POST) oleh Agendaris dan Staff.
- * Agendaris bisa membuat semua 7 jenis surat.
+ * @description Handler untuk rute API dokumen (koleksi). Mendukung pengambilan daftar dokumen (GET) dengan filter dan paginasi, serta pembuatan dokumen baru (POST).
+ * @location Diakses via HTTP GET/POST di endpoint `/api/documents`.
  */
 // app/api/documents/route.ts
 import { NextRequest, NextResponse } from "next/server";

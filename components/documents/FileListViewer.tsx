@@ -1,7 +1,7 @@
 /**
  * @file components/documents/FileListViewer.tsx
- * @description Komponen client untuk menampilkan daftar file dengan fitur preview modal.
- * Menghindari pembukaan tab baru/download otomatis saat ingin melihat isi file.
+ * @description Komponen client untuk menampilkan daftar lampiran file dengan fitur preview (modal) dan download.
+ * @location Dirender di halaman detail dokumen bagi semua pengguna untuk melihat file fisik hasil upload.
  */
 "use client";
 

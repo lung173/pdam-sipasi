@@ -1,6 +1,7 @@
 /**
  * @file components/layout/ThemeProvider.tsx
  * @description Provider untuk mengelola tema (Dark/Light) aplikasi.
+ * @location Dipanggil di `app/providers.tsx` untuk membungkus seluruh aplikasi.
  */
 "use client";
 

@@ -1,4 +1,9 @@
 // components/documents/UndanganDetail.tsx
+/**
+ * @file components/documents/UndanganDetail.tsx
+ * @description Komponen halaman detail khusus untuk tipe dokumen "Undangan", menampilkan waktu acara, lokasi, dan detail spesifik lainnya.
+ * @location Dirender di dalam halaman detail dokumen jika kategori surat adalah Undangan.
+ */
 "use client";
 
 import { useState } from "react";
@@ -69,7 +74,7 @@ export function UndanganDetail({
 *Perihal:* ${perihal}
 *Hari/Tanggal:* ${undangan.hari}, ${fmtStart}${isMultiDay ? ` s/d \n               ${fmtEnd}` : ""}
 *Jam:* ${undangan.jam} WIB
-*Tempat:* ${undangan.tempat} (${undangan.media === "ONLINE" ? "🎥 ONLINE" : "📍 OFFLINE"})
+*Tempat:* ${undangan.tempat} (${undangan.media === "ONLINE" ? "ONLINE" : "OFFLINE"})
 ${undangan.dresscode ? `*Dresscode:* ${undangan.dresscode}\n` : ""}${undangan.catatanLain ? `*Catatan:* ${undangan.catatanLain}\n` : ""}
 ${undangan.undanganType === "EXTERNAL" ? `*Pengirim:* ${undangan.pengirimExternal || "-"} (${undangan.kontakExternal || "-"})\n` : ""}
 *Penerima Undangan:*

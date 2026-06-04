@@ -8,6 +8,7 @@ import {
   FileText, Loader2, ArrowLeft, Send, Calendar, MailOpen,
   Briefcase, Award, Handshake, ScrollText, Plus, MapPin, Clock,
 } from "lucide-react";
+import Timekeeper from "react-timekeeper";
 import { FileUpload } from "@/components/documents/FileUpload";
 import { DOCUMENT_TYPE_LABELS } from "@/types";
 import type { DocumentType, DocumentCategory } from "@prisma/client";
@@ -52,6 +53,8 @@ function BuatSuratContent() {
     deadline: new Date().toISOString().split("T")[0],
   });
 
+  const [showTimekeeper, setShowTimekeeper] = useState(false);
+
   const setUnd = (key: string) => (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => setUndangan((p) => ({ ...p, [key]: e.target.value }));
@@ -71,7 +74,9 @@ function BuatSuratContent() {
       if (!undangan.hari) newErrors.undanganHari = "Hari kegiatan wajib dipilih.";
       if (!undangan.jam) newErrors.undanganJam = "Jam kegiatan wajib diisi.";
       if (!undangan.tanggal) newErrors.undanganTanggal = "Tanggal kegiatan wajib diisi.";
-      if (!undangan.tempat.trim()) newErrors.undanganTempat = "Tempat kegiatan wajib diisi.";
+      if (undangan.media === "OFFLINE" && !undangan.tempat.trim()) {
+        newErrors.undanganTempat = "Tempat kegiatan wajib diisi untuk media luring.";
+      }
       if (undangan.media === "ONLINE" && !undangan.detailMedia.trim()) {
         newErrors.undanganDetailMedia = "Detail media wajib diisi jika daring.";
       }
@@ -154,7 +159,7 @@ function BuatSuratContent() {
             <Plus className="w-6 h-6 text-blue-600" />
             Buat Dokumen Baru
           </h1>
-          <p className="page-subtitle">Agendaris — Buat surat baru dari 7 jenis dokumen</p>
+          <p className="page-subtitle">Agendaris — Buat surat baru dari 2 jenis dokumen</p>
         </div>
       </div>
 
@@ -244,9 +249,11 @@ function BuatSuratContent() {
             <input
               className="form-input"
               placeholder="Contoh: Direktur Utama PDAM"
-              value={form.tujuan}
+              // Jika jenis surat UNDANGAN, otomatis isi degnan "Direktur Utama PDAM"
+              value={form.documentType === "UNDANGAN" ? "Direktur Utama PDAM" : form.tujuan}
               onChange={set("tujuan")}
-              disabled={!!createdDocId}
+              // Disable input tujuan jika dokumen sudah dibuat / jika jenisnya UNDANGAN
+              disabled={!!createdDocId || form.documentType === "UNDANGAN"}
             />
           </div>
           <div>
@@ -300,14 +307,33 @@ function BuatSuratContent() {
                 </select>
               </div>
               <div>
-                <label className="form-label">Jam <span className="text-red-500">*</span></label>
-                <input
-                  type="time"
-                  className="form-input"
-                  value={undangan.jam}
-                  onChange={setUnd("jam")}
-                  disabled={!!createdDocId}
-                />
+                <label className="form-label font-semibold text-gray-700 mb-1 block">Jam Acara <span className="text-red-500">*</span></label>
+
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setShowTimekeeper(!showTimekeeper)}
+                    disabled={!!createdDocId}
+                    className="w-full flex items-center justify-between px-4 py-2.5 bg-white border-2 border-gray-200 rounded-xl hover:border-purple-200 transition-all text-gray-900 font-medium disabled:bg-gray-100"
+                  >
+                    <span>{undangan.jam || "Pilih jam..."}</span>
+                    <Clock className="w-5 h-5 text-gray-400" />
+                  </button>
+                  {showTimekeeper && (
+                    <div className="absolute z-50 top-14 left-0 shadow-2x1 rounded-2x1 overflow-hidden animate-in fade-in zoom-in-95 duration-200 border border-gray-100">
+                      <Timekeeper
+                        time={undangan.jam || "09:00"}
+                        onChange={(newTime) => {
+                          setUndangan((prev) => ({ ...prev, jam: newTime.formatted24}));
+                        }}
+                        onDoneClick={() => {
+                          setShowTimekeeper(false);
+                        }}
+                        switchToMinuteOnHourSelect={true}
+                      />
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -335,7 +361,9 @@ function BuatSuratContent() {
             </div>
 
             <div>
-              <label className="form-label">Tempat <span className="text-red-500">*</span></label>
+              <label className="form-label">
+                Tempat {undangan.media === "OFFLINE" && <span className="text-red-500">*</span>}
+              </label>
               <input
                 className="form-input"
                 placeholder="Contoh: Ruang Rapat Utama Lt. 2"

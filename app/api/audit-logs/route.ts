@@ -1,4 +1,9 @@
 // app/api/audit-logs/route.ts
+/**
+ * @file app/api/audit-logs/route.ts
+ * @description Route API untuk mengambil riwayat aktivitas sistem (audit log).
+ * @location Diakses via HTTP GET di endpoint `/api/audit-logs` (khusus Admin).
+ */
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireRole, successResponse, errorResponse } from "@/lib/auth-helpers";

@@ -1,4 +1,9 @@
 // components/layout/AjukanSuratModal.tsx
+/**
+ * @file components/layout/AjukanSuratModal.tsx
+ * @description Komponen modal (dialog) yang berisi form untuk mengajukan atau mengunggah surat masuk/keluar baru ke dalam sistem.
+ * @location Dirender secara global atau dipanggil dari tombol "AjukanSuratButton".
+ */
 "use client";
 import { useState, useRef, DragEvent } from "react";
 import { useRouter } from "next/navigation";

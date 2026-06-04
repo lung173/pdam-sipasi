@@ -188,13 +188,6 @@ export default async function CetakGabungan(props: Params) {
                     {latestDisposisi.keterangan}
                   </p>
                 ) : null}
-
-                {/* Dotted lines filling */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                  {Array.from({ length: latestDisposisi?.keterangan ? 5 : 7 }).map((_, i) => (
-                    <div key={i} style={{ borderBottom: '1px dotted #555', height: '10px' }} />
-                  ))}
-                </div>
               </div>
             </div>
           </div>

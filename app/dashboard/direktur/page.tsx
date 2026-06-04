@@ -1,4 +1,9 @@
 // app/dashboard/direktur/page.tsx
+/**
+ * @file app/dashboard/direktur/page.tsx
+ * @description Dashboard utama untuk role DIREKTUR. Menampilkan dokumen yang butuh review, statistik persetujuan, dan status surat.
+ * @location Ditampilkan pada URL "/dashboard/direktur".
+ */
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 import { redirect } from "next/navigation";

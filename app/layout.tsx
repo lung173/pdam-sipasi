@@ -1,10 +1,9 @@
 /**
  * @file app/layout.tsx
- * @description Layout utama (Root Layout) untuk seluruh aplikasi.
- * Mengatur konfigurasi font, metadata SEO, integrasi toaster notifikasi, 
- * dan membungkus aplikasi dengan Providers (NextAuth & Context).
+ * @description Layout utama (Root Layout) untuk seluruh aplikasi. Mengatur konfigurasi font, metadata SEO, integrasi toaster notifikasi, dan membungkus aplikasi dengan Providers (NextAuth & Context).
+ * @location Dirender di semua halaman aplikasi (membungkus {children}).
  */
-// app/layout.tsx
+
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";

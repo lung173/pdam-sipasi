@@ -1,4 +1,9 @@
 // components/documents/DirectorDisposisiPanel.tsx
+/**
+ * @file components/documents/DirectorDisposisiPanel.tsx
+ * @description Komponen panel bagi Direktur untuk mendisposisikan surat/dokumen ke bagian lain (misal: Kabag/Kasubag) dengan memberikan instruksi.
+ * @location Dirender di halaman disposisi Direktur ("/dashboard/direktur/disposisi/[id]").
+ */
 // Panel untuk Direktur mengisi Lembar Disposisi (Disposisi Kepada + Instruksi)
 // Tanggal Instruksi WAJIB, Tanggal Penyelesaian diperluas
 "use client";

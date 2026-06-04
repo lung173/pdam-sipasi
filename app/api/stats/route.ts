@@ -1,4 +1,9 @@
-﻿// app/api/stats/route.ts
+// app/api/stats/route.ts
+/**
+ * @file app/api/stats/route.ts
+ * @description Route API untuk mengambil data statistik (summary dokumen) untuk ditampilkan di dashboard.
+ * @location Diakses via HTTP GET di endpoint `/api/stats`.
+ */
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAuth, successResponse, errorResponse } from "@/lib/auth-helpers";
