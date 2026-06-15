@@ -76,7 +76,7 @@ export default async function AdminSemuaDokumenPage(props: Params) {
       include: {
         createdBy: { select: { id: true, name: true, divisi: true } },
       },
-      orderBy: { updatedAt: "desc" },
+      orderBy: { tanggalSurat: "desc" },
       skip: (page - 1) * PAGE_SIZE,
       take: PAGE_SIZE,
     }),

@@ -1,4 +1,4 @@
-﻿// app/dashboard/direktur/antrian/page.tsx
+// app/dashboard/direktur/antrian/page.tsx
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 import { redirect } from "next/navigation";
@@ -13,12 +13,12 @@ export default async function DirekturAntrianPage() {
 
   const documents = await prisma.suratMasuk.findMany({
     where: {
-      currentStatus: "MENUNGGU_KEPUTUSAN_DIREKTUR",
+      currentStatus: { in: ["MENUNGGU_KEPUTUSAN_DIREKTUR", "DIPROSES_DIREKTUR"] },
     },
     include: {
       createdBy: { select: { id: true, name: true, divisi: true } },
     },
-    orderBy: { updatedAt: "asc" }, // FIFO (first in, first out)
+    orderBy: { tanggalSurat: "desc" },
   });
 
   return (
@@ -34,7 +34,7 @@ export default async function DirekturAntrianPage() {
               Antrian Keputusan
             </h1>
             <p className="page-subtitle">
-              Sistem menampilkan urutan dari yang **terlama menunggu** hingga yang paling baru masuk (FIFO).
+              Sistem menampilkan urutan dokumen berdasarkan tanggal surat terbaru.
             </p>
           </div>
         </div>

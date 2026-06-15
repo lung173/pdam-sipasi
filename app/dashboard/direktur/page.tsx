@@ -25,7 +25,7 @@ export default async function DirektuurDashboard() {
   if (!session || session.user.role !== "DIREKTUR") redirect("/dashboard");
 
   const [menunggu, totalKeputusan, recentDecisions, antrianDocs] = await Promise.all([
-    prisma.suratMasuk.count({ where: { currentStatus: "MENUNGGU_KEPUTUSAN_DIREKTUR" } }),
+    prisma.suratMasuk.count({ where: { currentStatus: { in: ["MENUNGGU_KEPUTUSAN_DIREKTUR", "DIPROSES_DIREKTUR"] } } }),
     prisma.directorDecision.count({ where: { directorId: session.user.id } }),
     prisma.directorDecision.findMany({
       where: { directorId: session.user.id },
@@ -36,9 +36,9 @@ export default async function DirektuurDashboard() {
       take: 5,
     }),
     prisma.suratMasuk.findMany({
-      where: { currentStatus: "MENUNGGU_KEPUTUSAN_DIREKTUR" },
+      where: { currentStatus: { in: ["MENUNGGU_KEPUTUSAN_DIREKTUR", "DIPROSES_DIREKTUR"] } },
       include: { createdBy: { select: { name: true, divisi: true } } },
-      orderBy: { updatedAt: "asc" }, // FIFO
+      orderBy: { tanggalSurat: "desc" },
       take: 8,
     }),
   ]);
@@ -55,7 +55,7 @@ export default async function DirektuurDashboard() {
       <div className="grid grid-cols-3 gap-4">
         <StatCard title="Menunggu Keputusan" value={menunggu}       icon={Clock}         color="yellow" subtitle="Perlu ditindaklanjuti" />
         <StatCard title="Total Keputusan"    value={totalKeputusan} icon={CheckCircle}   color="green"  subtitle="Sepanjang masa" />
-        <StatCard title="Dalam Antrian"      value={menunggu}       icon={ClipboardList} color="blue"   subtitle="Urut terlama dahulu" />
+        <StatCard title="Dalam Antrian"      value={menunggu}       icon={ClipboardList} color="blue"   subtitle="Urut terbaru dahulu" />
       </div>
 
       {/* Antrian dokumen */}

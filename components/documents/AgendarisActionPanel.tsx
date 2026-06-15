@@ -476,40 +476,7 @@ export function AgendarisActionPanel({
                     />
                   </FormEditRow>
                 </div>
-                {/* Row 4: Kategori Keperluan — hanya untuk Surat Masuk */}
-                {mode === "disposisi_masuk" && (
-                <div className="grid grid-cols-1 divide-gray-300">
-                  <FormEditRow label="Kategori Keperluan">
-                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-1.5">
-                      {[
-                        { value: "UNDANGAN", label: "Undangan" },
-                        { value: "PEMBELIAN", label: "Pembelian" },
-                        { value: "KERJASAMA", label: "Kerjasama" },
-                        { value: "KEPEGAWAIAN", label: "Kepegawaian" },
-                        { value: "KEUANGAN", label: "Keuangan" },
-                        { value: "PERIZINAN", label: "Perizinan" },
-                        { value: "PENGADAAN", label: "Pengadaan" },
-                        { value: "HUKUM", label: "Hukum" },
-                        { value: "TEKNIK", label: "Teknik" },
-                        { value: "DLL", label: "Lain-lain" },
-                      ].map((cat) => (
-                        <button
-                          key={cat.value}
-                          type="button"
-                          onClick={() => setEditCategory(cat.value)}
-                          className={`px-2 py-1.5 rounded-md border text-[10px] font-medium transition-all text-center
-                            ${editCategory === cat.value
-                              ? "border-blue-500 bg-blue-50 text-blue-800 ring-1 ring-blue-300"
-                              : "border-gray-200 text-gray-600 hover:border-gray-300 hover:bg-gray-50"
-                            }`}
-                        >
-                          {cat.label}
-                        </button>
-                      ))}
-                    </div>
-                  </FormEditRow>
-                </div>
-                )}
+
               </div>
 
               {/* Acara Undangan Details Form (Only for Undangan) */}

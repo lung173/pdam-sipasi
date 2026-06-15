@@ -35,13 +35,13 @@ export default async function AdminDashboard() {
     prisma.suratMasuk.findMany({
       where: { currentStatus: { in: ["MENUNGGU_KEPUTUSAN_DIREKTUR", "DIPROSES_DIREKTUR"] } },
       include: { createdBy: { select: { name: true, divisi: true } } },
-      orderBy: { updatedAt: "desc" },
+      orderBy: { tanggalSurat: "desc" },
       take: 5,
     }),
     prisma.suratMasuk.findMany({
       where: { currentStatus: { in: ["KEPUTUSAN_DIREKTUR_SELESAI", "PERLU_REVISI"] } },
       include: { createdBy: { select: { name: true, divisi: true } } },
-      orderBy: { updatedAt: "desc" },
+      orderBy: { tanggalSurat: "desc" },
       take: 5,
     }),
     prisma.undangan.findMany({

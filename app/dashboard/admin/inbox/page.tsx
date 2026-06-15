@@ -15,19 +15,19 @@ export default async function AdminInboxPage() {
     prisma.suratMasuk.findMany({
       where: { currentStatus: "MENUNGGU_REVIEW_AGENDARIS" },
       include: { createdBy: { select: { id: true, name: true, divisi: true } } },
-      orderBy: { updatedAt: "asc" },
+      orderBy: { tanggalSurat: "desc" },
     }),
     prisma.suratMasuk.findMany({
       where: {
         currentStatus: { in: ["MENUNGGU_KEPUTUSAN_DIREKTUR", "DIPROSES_DIREKTUR"] },
       },
       include: { createdBy: { select: { id: true, name: true, divisi: true } } },
-      orderBy: { updatedAt: "desc" },
+      orderBy: { tanggalSurat: "desc" },
     }),
     prisma.suratMasuk.findMany({
       where: { currentStatus: "KEPUTUSAN_DIREKTUR_SELESAI" },
       include: { createdBy: { select: { id: true, name: true, divisi: true } } },
-      orderBy: { updatedAt: "desc" },
+      orderBy: { tanggalSurat: "desc" },
     }),
   ]);
 

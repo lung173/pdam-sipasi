@@ -1,4 +1,4 @@
-﻿// app/dashboard/direktur/riwayat/page.tsx
+// app/dashboard/direktur/riwayat/page.tsx
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 import { redirect } from "next/navigation";
@@ -18,7 +18,7 @@ export default async function DirekturRiwayatPage() {
     include: {
       createdBy: { select: { id: true, name: true, divisi: true } },
     },
-    orderBy: { updatedAt: "desc" },
+    orderBy: { tanggalSurat: "desc" },
   });
 
   return (
