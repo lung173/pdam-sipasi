@@ -55,42 +55,6 @@ export function UndanganDetail({
   const fmtStart = format(startDate, "EEEE, dd MMMM yyyy", { locale: localeId });
   const fmtEnd = format(endDate, "EEEE, dd MMMM yyyy", { locale: localeId });
 
-  // Generate Google Calendar Link
-  const formatGCalDate = (d: Date) => d.toISOString().replace(/-|:|\.\d\d\d/g, "");
-  // Set end date to be 1 hour later for gcal if same day, or use end date
-  const gcalStart = formatGCalDate(startDate);
-  const gcalEnd = formatGCalDate(new Date(endDate.getTime() + 60 * 60 * 1000));
-  
-  const gcalUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(
-    `Undangan: ${perihal}`
-  )}&dates=${gcalStart}/${gcalEnd}&details=${encodeURIComponent(
-    `Dresscode: ${undangan.dresscode || "-"}\nCatatan: ${undangan.catatanLain || "-"}\n\nDisinkronkan otomatis via PDAM SIPASI.`
-  )}&location=${encodeURIComponent(undangan.tempat)}`;
-
-  // Generate WhatsApp Prefilled Text
-  const recipientNames = undangan.penerima.map((p) => `- ${p.user.name} (${p.user.divisi || "-"})`).join("\n");
-  const waText = `*UNDANGAN INTRA-OFFICE PDAM TIRTA MAKMUR*
---------------------------------------------------
-*Perihal:* ${perihal}
-*Hari/Tanggal:* ${undangan.hari}, ${fmtStart}${isMultiDay ? ` s/d \n               ${fmtEnd}` : ""}
-*Jam:* ${undangan.jam} WIB
-*Tempat:* ${undangan.tempat} (${undangan.media === "ONLINE" ? "ONLINE" : "OFFLINE"})
-${undangan.dresscode ? `*Dresscode:* ${undangan.dresscode}\n` : ""}${undangan.catatanLain ? `*Catatan:* ${undangan.catatanLain}\n` : ""}
-${undangan.undanganType === "EXTERNAL" ? `*Pengirim:* ${undangan.pengirimExternal || "-"} (${undangan.kontakExternal || "-"})\n` : ""}
-*Penerima Undangan:*
-${recipientNames || "-"}
---------------------------------------------------
-_Silakan koordinasikan agenda ini melalui aplikasi SIPASI._`;
-
-  const waShareUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(waText)}`;
-
-  const handleCopyWA = () => {
-    navigator.clipboard.writeText(waText);
-    setCopied(true);
-    toast.success("Teks undangan disalin ke clipboard!");
-    setTimeout(() => setCopied(false), 2000);
-  };
-
   return (
     <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-sm overflow-hidden transition-all hover:shadow-md">
       {/* Header */}
@@ -235,66 +199,6 @@ _Silakan koordinasikan agenda ini melalui aplikasi SIPASI._`;
             </div>
           </div>
         )}
-
-        {/* Divider */}
-        <div className="h-px bg-gray-100 dark:bg-slate-800" />
-
-        {/* Actions panel */}
-        <div className="flex flex-col sm:flex-row gap-3">
-          {/* Google Calendar Link */}
-          <a
-            href={gcalUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-blue-50 dark:bg-blue-950/20 hover:bg-blue-100 dark:hover:bg-blue-900/30 text-blue-700 dark:text-blue-400 font-bold text-xs shadow-sm transition-all border border-blue-100 dark:border-blue-900/30 hover:scale-[1.02]"
-          >
-            <Calendar className="w-4 h-4" />
-            Tambah ke Google Calendar
-            <ExternalLink className="w-3 h-3" />
-          </a>
-
-          {/* WhatsApp Direct Share */}
-          <a
-            href={waShareUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/20 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 font-bold text-xs shadow-sm transition-all border border-emerald-100 dark:border-emerald-900/30 hover:scale-[1.02]"
-          >
-            <Share2 className="w-4 h-4" />
-            Kirim ke WhatsApp
-            <ExternalLink className="w-3 h-3" />
-          </a>
-
-          {/* Copy WA Text */}
-          <button
-            onClick={handleCopyWA}
-            className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-800 hover:bg-gray-100 dark:hover:bg-slate-700 text-gray-700 dark:text-slate-300 font-bold text-xs shadow-sm transition-all border border-gray-200 dark:border-slate-700"
-          >
-            {copied ? (
-              <>
-                <Check className="w-4 h-4 text-emerald-500 animate-bounce" />
-                Tersalin!
-              </>
-            ) : (
-              <>
-                <Share2 className="w-4 h-4" />
-                Salin Teks WA
-              </>
-            )}
-          </button>
-        </div>
-
-        {/* Sync Status Banner */}
-        <div className="flex items-center justify-between px-4 py-2.5 rounded-xl bg-purple-50/50 dark:bg-purple-950/10 border border-purple-100 dark:border-purple-900/20 text-[10px] text-purple-700 dark:text-purple-400 font-semibold">
-          <div className="flex items-center gap-1.5">
-            <Mail className="w-3.5 h-3.5" />
-            <span>Notifikasi Email Terkirim ke Penerima</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span>
-            <span>Synced</span>
-          </div>
-        </div>
       </div>
     </div>
   );

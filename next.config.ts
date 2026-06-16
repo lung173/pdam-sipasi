@@ -1,11 +1,18 @@
 import type { NextConfig } from "next";
 
-const nextConfig: NextConfig = {
+type ExtendedNextConfig = NextConfig & {
+  allowedDevOrigins?: string[];
+};
+
+const nextConfig: ExtendedNextConfig = {
+  allowedDevOrigins: ["192.168.1.5", "192.168.1.5:3000", "192.168.1.5:3001"],
+
   experimental: {
     serverActions: {
       bodySizeLimit: "12mb", //Untuk file upload
     },
   },
+
   //Izinkan upload ke /public/uploads
   async headers() {
     return [
