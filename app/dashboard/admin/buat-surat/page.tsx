@@ -8,8 +8,8 @@ import {
   FileText, Loader2, ArrowLeft, Send, Calendar, MailOpen,
   Briefcase, Award, Handshake, ScrollText, Plus, MapPin, Clock,
 } from "lucide-react";
-import Timekeeper from "react-timekeeper";
 import { FileUpload } from "@/components/documents/FileUpload";
+import { FadeIn } from "@/components/ui/FadeIn";
 import { DOCUMENT_TYPE_LABELS } from "@/types";
 import type { DocumentType, DocumentCategory } from "@prisma/client";
 
@@ -52,8 +52,6 @@ function BuatSuratContent() {
     catatanLain: "",
     deadline: new Date().toISOString().split("T")[0],
   });
-
-  const [showTimekeeper, setShowTimekeeper] = useState(false);
 
   const setUnd = (key: string) => (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -164,7 +162,7 @@ function BuatSuratContent() {
       </div>
 
       {/* Step 1: Pilih Jenis Surat */}
-      <div className="card p-6 space-y-5">
+      <FadeIn delay={0.1} className="card p-6 space-y-5">
         <div className="flex items-center gap-2 mb-2">
           <FileText className="w-5 h-5 text-blue-600" />
           <h2 className="font-semibold text-gray-900 dark:text-white">1. Pilih Jenis Surat</h2>
@@ -190,10 +188,10 @@ function BuatSuratContent() {
             );
           })}
         </div>
-      </div>
+      </FadeIn>
 
       {/* Step 2: Form */}
-      <div className="card p-6 space-y-5">
+      <FadeIn delay={0.2} className="card p-6 space-y-5">
         <div className="flex items-center gap-2 mb-2">
           <FileText className="w-5 h-5 text-blue-600" />
           <h2 className="font-semibold text-gray-900 dark:text-white">
@@ -310,29 +308,14 @@ function BuatSuratContent() {
                 <label className="form-label font-semibold text-gray-700 mb-1 block">Jam Acara <span className="text-red-500">*</span></label>
 
                 <div className="relative">
-                  <button
-                    type="button"
-                    onClick={() => setShowTimekeeper(!showTimekeeper)}
+                  <input
+                    type="time"
+                    className="w-full flex items-center justify-between px-4 py-2.5 bg-white border-2 border-gray-200 rounded-xl hover:border-purple-200 transition-all text-gray-900 font-medium disabled:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent appearance-none"
+                    value={undangan.jam}
+                    onChange={setUnd("jam")}
                     disabled={!!createdDocId}
-                    className="w-full flex items-center justify-between px-4 py-2.5 bg-white border-2 border-gray-200 rounded-xl hover:border-purple-200 transition-all text-gray-900 font-medium disabled:bg-gray-100"
-                  >
-                    <span>{undangan.jam || "Pilih jam..."}</span>
-                    <Clock className="w-5 h-5 text-gray-400" />
-                  </button>
-                  {showTimekeeper && (
-                    <div className="absolute z-50 top-14 left-0 shadow-2x1 rounded-2x1 overflow-hidden animate-in fade-in zoom-in-95 duration-200 border border-gray-100">
-                      <Timekeeper
-                        time={undangan.jam || "09:00"}
-                        onChange={(newTime) => {
-                          setUndangan((prev) => ({ ...prev, jam: newTime.formatted24}));
-                        }}
-                        onDoneClick={() => {
-                          setShowTimekeeper(false);
-                        }}
-                        switchToMinuteOnHourSelect={true}
-                      />
-                    </div>
-                  )}
+                  />
+                  <Clock className="w-5 h-5 text-gray-400 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none bg-white" />
                 </div>
               </div>
             </div>
@@ -443,11 +426,11 @@ function BuatSuratContent() {
             {loading ? <><Loader2 className="w-4 h-4 animate-spin" /> Menyimpan...</> : "Simpan Dokumen"}
           </button>
         )}
-      </div>
+      </FadeIn>
 
       {/* Step 3: Upload */}
       {createdDocId && (
-        <div className="card p-6 space-y-4">
+        <FadeIn delay={0.3} className="card p-6 space-y-4">
           <h2 className="font-semibold text-gray-900 dark:text-white">3. Upload File Dokumen</h2>
           <p className="text-sm text-gray-500 dark:text-slate-400">
             Upload file scan dokumen (PDF, JPG, atau PNG, maks. 10MB).
@@ -457,12 +440,12 @@ function BuatSuratContent() {
             fileType="FINAL_SCAN" // Agendaris usually uploads FINAL_SCAN or DRAFT, let's use FINAL_SCAN since they are admin
             label="File Scan Dokumen"
           />
-        </div>
+        </FadeIn>
       )}
 
       {/* Step 4: Submit / Selesai */}
       {createdDocId && (
-        <div className="card p-6 bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
+        <FadeIn delay={0.4} className="card p-6 bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
           <h2 className="font-semibold text-gray-900 dark:text-white mb-2">4. Selesai</h2>
           <p className="text-sm text-gray-600 dark:text-slate-400 mb-4">
             File dokumen telah di-upload. Anda dapat kembali ke Dashboard.
@@ -482,7 +465,7 @@ function BuatSuratContent() {
               <Send className="w-4 h-4" /> Selesai & Kembali
             </button>
           </div>
-        </div>
+        </FadeIn>
       )}
     </div>
   );

@@ -469,3 +469,23 @@ model UndanganReminderLog {
   @@index([undanganId])
   @@map("undangan_reminder_log")
 }
+
+// ─────────────────────────────────────────────
+//  NOTIFICATION QUEUE
+// ─────────────────────────────────────────────
+
+model NotificationQueue {
+  id         String   @id @default(cuid())
+  type       String   // "EMAIL" | "WHATSAPP"
+  target     String   // email address or phone number
+  subject    String?  // for email
+  message    String   @db.Text
+  status     String   @default("PENDING") // "PENDING" | "SENT" | "FAILED"
+  retryCount Int      @default(0) @map("retry_count")
+  errorLog   String?  @db.Text @map("error_log")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  @@index([status])
+  @@map("notification_queue")
+}

@@ -5,6 +5,7 @@ import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { loginSchema } from "@/lib/validations";
 import { UserRole } from "@prisma/client";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 declare module "next-auth" {
   interface User {
@@ -45,7 +46,16 @@ export const authOptions: NextAuthOptions = {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials) {
+      async authorize(credentials, req) {
+        // Rate Limiter Check
+        const forwardedFor = req?.headers?.["x-forwarded-for"];
+        const ip = typeof forwardedFor === 'string' ? forwardedFor.split(',')[0] : "unknown-ip";
+        const rateLimitResult = checkRateLimit(ip, 5, 15 * 60 * 1000); // 5 requests per 15 minutes
+        
+        if (!rateLimitResult.success) {
+          throw new Error("Terlalu banyak percobaan login. Silakan coba lagi nanti.");
+        }
+
         // Validasi input
         const parsed = loginSchema.safeParse(credentials);
         if (!parsed.success) throw new Error("Input tidak valid.");
@@ -62,6 +72,11 @@ export const authOptions: NextAuthOptions = {
         const valid = await bcrypt.compare(password, user.passwordHash);
         if (!valid) throw new Error("Email atau password salah.");
 
+        // PENTING: Jangan return image base64! NextAuth otomatis copy user.image
+        // ke token.picture yang menyebabkan session cookie membengkak.
+        // Hanya return URL path, bukan base64.
+        const safeImage = user.image && !user.image.startsWith("data:") ? user.image : null;
+
         return {
           id: user.id,
           name: user.name,
@@ -69,7 +84,7 @@ export const authOptions: NextAuthOptions = {
           role: user.role,
           divisi: user.divisi,
           title: user.title,
-          image: user.image,
+          image: safeImage,
         };
       },
     }),
@@ -82,19 +97,38 @@ export const authOptions: NextAuthOptions = {
 
   callbacks: {
     async jwt({ token, user, trigger, session }) {
+      // Helper: hanya simpan image jika berupa URL path, BUKAN base64
+      // Base64 image bisa ratusan KB - MB dan menyebabkan session cookie membengkak
+      const sanitizeImage = (img: string | null | undefined): string | null => {
+        if (!img) return null;
+        if (img.startsWith("data:")) return null; // Tolak base64!
+        return img;
+      };
+
+      // KRITIS: Hapus token.picture!
+      // NextAuth v4 otomatis copy user.image ke token.picture (field default).
+      // Jika image berupa base64, token.picture akan berisi ratusan KB data
+      // yang membuat session cookie membengkak walaupun token.image sudah kita sanitize.
+      delete (token as any).picture;
+
       if (user) {
         token.id = user.id;
         token.role = user.role;
         token.divisi = user.divisi;
         token.title = user.title;
-        token.image = user.image;
+        token.image = sanitizeImage(user.image);
       }
       
       // Update token if user profile is updated
       if (trigger === "update" && session) {
         token.name = session.name;
         token.title = session.title;
-        token.image = session.image;
+        token.image = sanitizeImage(session.image);
+      }
+
+      // Sanitize: jika token sudah terlanjur menyimpan base64, bersihkan
+      if (typeof token.image === "string" && token.image.startsWith("data:")) {
+        token.image = null;
       }
 
       // Re-sync with DB periodically or on demand
@@ -105,7 +139,7 @@ export const authOptions: NextAuthOptions = {
         });
         if (dbUser) {
           token.title = dbUser.title;
-          token.image = dbUser.image;
+          token.image = sanitizeImage(dbUser.image);
           token.name = dbUser.name;
         }
       }

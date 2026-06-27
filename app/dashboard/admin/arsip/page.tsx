@@ -10,6 +10,7 @@ import { Archive, Eye, CheckCircle, ArrowLeft } from "lucide-react";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ArsipFilter } from "@/components/documents/ArsipFilter";
 import { Suspense } from "react";
+import { FadeIn } from "@/components/ui/FadeIn";
 
 type Props = { searchParams: Promise<{ bulan?: string; tahun?: string }> };
 
@@ -84,7 +85,7 @@ export default async function AdminArsipPage({ searchParams }: Props) {
       </div>
 
       {/* Antrian Arsip */}
-      <div className="card">
+      <FadeIn delay={0.1} className="card">
         <div className="px-5 py-4 border-b border-gray-100 dark:border-slate-800 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Archive className="w-5 h-5 text-teal-600" />
@@ -168,23 +169,23 @@ export default async function AdminArsipPage({ searchParams }: Props) {
             </table>
           </div>
         )}
-      </div>
+      </FadeIn>
 
       {/* Riwayat arsip — dikelompokkan per jenis surat */}
-      <div className="flex flex-wrap items-center justify-between gap-3 mb-2">
+      <FadeIn delay={0.2} className="flex flex-wrap items-center justify-between gap-3 mb-2">
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Riwayat Arsip Tersimpan</h2>
         <Suspense>
           <ArsipFilter />
         </Suspense>
-      </div>
+      </FadeIn>
 
       {archivedDocs.length === 0 ? (
-        <div className="card p-4">
+        <FadeIn delay={0.3} className="card p-4">
           <EmptyState title="Belum ada arsip" description="Dokumen yang diarsipkan akan muncul di sini." />
-        </div>
+        </FadeIn>
       ) : (
-        Object.entries(groupedArchive).map(([type, docs]) => (
-          <div key={type} className="card">
+        Object.entries(groupedArchive).map(([type, docs], index) => (
+          <FadeIn key={type} delay={0.3 + (index * 0.1)} className="card">
             <div className="px-5 py-3 border-b border-gray-100 dark:border-slate-800 flex items-center gap-2">
               <Archive className="w-4 h-4 text-teal-600" />
               <h3 className="font-semibold text-gray-900 dark:text-white">
@@ -231,7 +232,7 @@ export default async function AdminArsipPage({ searchParams }: Props) {
                 </tbody>
               </table>
             </div>
-          </div>
+          </FadeIn>
         ))
       )}
     </div>

@@ -58,7 +58,7 @@ export default function ProfilePage() {
     }
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -67,11 +67,24 @@ export default function ProfilePage() {
       return;
     }
 
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setFormData({ ...formData, image: reader.result as string });
-    };
-    reader.readAsDataURL(file);
+    try {
+      const uploadData = new FormData();
+      uploadData.append("file", file);
+
+      const res = await fetch("/api/user/avatar", {
+        method: "POST",
+        body: uploadData,
+      });
+
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || "Gagal mengupload foto.");
+
+      // Simpan URL path (bukan base64!) ke form data
+      setFormData({ ...formData, image: json.data.url });
+      toast.success("Foto berhasil diupload!");
+    } catch (err: any) {
+      toast.error(err.message);
+    }
   };
 
   return (

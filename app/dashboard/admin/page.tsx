@@ -19,6 +19,7 @@ import {
   FileText, Users, Archive, CheckCircle, Eye, ArrowRight,
   Activity, Clock, Plus, Calendar as CalendarIcon, MessageCircle,
 } from "lucide-react";
+import { FadeIn } from "@/components/ui/FadeIn";
 
 export default async function AdminDashboard() {
   const session = await getServerSession(authOptions);
@@ -85,10 +86,18 @@ export default async function AdminDashboard() {
 
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard title="Total Dokumen" value={totalDokumen} icon={FileText} color="blue" />
-        <StatCard title="User Aktif" value={totalUser} icon={Users} color="green" />
-        <StatCard title="Antrian Arsip" value={menungguArsip} icon={Clock} color="yellow" subtitle="Perlu diarsipkan" />
-        <StatCard title="Arsip Selesai" value={arsipFinal} icon={CheckCircle} color="purple" />
+        <FadeIn delay={0.1}>
+          <StatCard title="Total Dokumen" value={totalDokumen} icon={FileText} color="blue" />
+        </FadeIn>
+        <FadeIn delay={0.2}>
+          <StatCard title="User Aktif" value={totalUser} icon={Users} color="green" />
+        </FadeIn>
+        <FadeIn delay={0.3}>
+          <StatCard title="Antrian Arsip" value={menungguArsip} icon={Clock} color="yellow" subtitle="Perlu diarsipkan" />
+        </FadeIn>
+        <FadeIn delay={0.4}>
+          <StatCard title="Arsip Selesai" value={arsipFinal} icon={CheckCircle} color="purple" />
+        </FadeIn>
       </div>
 
       {/* Alert arsip */}
@@ -111,7 +120,7 @@ export default async function AdminDashboard() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Menunggu Keputusan Direktur */}
-        <div className="card flex flex-col h-full">
+        <FadeIn delay={0.5} className="card flex flex-col h-full">
           <div className="px-5 py-4 border-b border-gray-100 dark:border-slate-800 flex items-center justify-between">
             <h2 className="font-semibold text-gray-900 dark:text-white">Menunggu Keputusan Direktur</h2>
             <Link href="/dashboard/admin/dokumen" className="text-xs text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1">
@@ -141,10 +150,10 @@ export default async function AdminDashboard() {
               ))}
             </div>
           )}
-        </div>
+        </FadeIn>
 
         {/* Hasil Keputusan Direktur */}
-        <div className="card flex flex-col h-full border-green-100 dark:border-green-900/30">
+        <FadeIn delay={0.6} className="card flex flex-col h-full border-green-100 dark:border-green-900/30">
           <div className="px-5 py-4 border-b border-gray-100 dark:border-slate-800 flex items-center justify-between bg-green-50/50 dark:bg-green-950/10 rounded-t-xl">
             <h2 className="font-semibold text-green-900 dark:text-green-300">Hasil Keputusan Direktur</h2>
             <span className="text-[10px] bg-green-100 text-green-800 px-2 py-0.5 rounded-full font-bold dark:bg-green-900 dark:text-green-200">Terbaru</span>
@@ -172,10 +181,10 @@ export default async function AdminDashboard() {
               ))}
             </div>
           )}
-        </div>
+        </FadeIn>
 
         {/* Jadwal Terdekat (Undangan) */}
-        <div className="card flex flex-col h-full">
+        <FadeIn delay={0.7} className="card flex flex-col h-full">
           <div className="px-5 py-4 border-b border-gray-100 dark:border-slate-800 flex items-center justify-between">
             <h2 className="font-semibold text-gray-900 dark:text-white">Jadwal Terdekat (Undangan)</h2>
             <Link href="/dashboard/admin/dokumen" className="text-xs text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1">
@@ -243,11 +252,11 @@ export default async function AdminDashboard() {
               })}
             </div>
           )}
-        </div>
+        </FadeIn>
       </div>
 
       {/* Status distribution */}
-      <div className="card p-5">
+      <FadeIn delay={0.8} className="card p-5">
         <h2 className="font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
           <Activity className="w-4 h-4 text-blue-600 dark:text-blue-400" /> Distribusi Status Dokumen
         </h2>
@@ -259,7 +268,7 @@ export default async function AdminDashboard() {
             </div>
           ))}
         </div>
-      </div>
+      </FadeIn>
     </div>
   );
 }

@@ -9,6 +9,7 @@ import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { Eye, EyeOff, Loader2, FileText } from "lucide-react";
+import { FadeIn } from "@/components/ui/FadeIn";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -54,18 +55,20 @@ export default function LoginPage() {
 
       <div className="relative w-full max-w-md">
         {/* Header */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-white/10 backdrop-blur-sm rounded-2xl mb-4 border border-white/20">
-            <FileText className="w-8 h-8 text-white" />
+        <FadeIn delay={0.1}>
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-white/10 backdrop-blur-sm rounded-2xl mb-4 border border-white/20">
+              <FileText className="w-8 h-8 text-white" />
+            </div>
+            <h1 className="text-2xl font-bold text-white tracking-tight">SIPAS PDAM</h1>
+            <p className="text-blue-100 text-sm mt-1 font-medium">
+              Sistem Informasi Pengelolaan Arsip Surat
+            </p>
           </div>
-          <h1 className="text-2xl font-bold text-white tracking-tight">SIPAS PDAM</h1>
-          <p className="text-blue-100 text-sm mt-1 font-medium">
-            Sistem Informasi Pengelolaan Arsip Surat
-          </p>
-        </div>
+        </FadeIn>
 
         {/* Card */}
-        <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-10 transition-all">
+        <FadeIn delay={0.2} className="bg-white rounded-3xl shadow-2xl p-8 md:p-10 transition-all">
           <h2 className="text-xl font-bold text-slate-900 mb-1">Masuk ke Sistem</h2>
           <p className="text-sm text-slate-500 mb-8">
             Gunakan akun yang telah diberikan oleh Administrator.
@@ -153,11 +156,13 @@ export default function LoginPage() {
               <p className="mt-2 text-slate-400 italic">Password standar: Nama@12345 (contoh: Staff@12345)</p>
             </div>
           </details>
-        </div>
+        </FadeIn>
 
-        <p className="text-center text-blue-100 text-[10px] font-bold uppercase tracking-widest mt-8 opacity-80">
-          © {new Date().getFullYear()} PDAM • Sistem Informasi Pengelolaan Arsip Surat
-        </p>
+        <FadeIn delay={0.3}>
+          <p className="text-center text-blue-100 text-[10px] font-bold uppercase tracking-widest mt-8 opacity-80">
+            © {new Date().getFullYear()} PDAM • Sistem Informasi Pengelolaan Arsip Surat
+          </p>
+        </FadeIn>
       </div>
     </div>
   );

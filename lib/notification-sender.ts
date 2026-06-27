@@ -22,35 +22,18 @@ const transporter = nodemailer.createTransport({
  * Harap isi WA_API_TOKEN dan WA_API_URL di .env.
  */
 async function sendWhatsAppMessage(targetNumber: string, message: string) {
-  const waToken = process.env.WA_API_TOKEN;
-  const waUrl = process.env.WA_API_URL || "https://api.fonnte.com/send"; // Default Fonnte
-
-  if (!waToken || !targetNumber) {
-    console.log("[WA Notification] Skipped. Token or Number missing.", { targetNumber });
-    return;
-  }
-
   try {
-    const response = await fetch(waUrl, {
-      method: "POST",
-      headers: {
-        "Authorization": waToken,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
+    await prisma.notificationQueue.create({
+      data: {
+        type: "WHATSAPP",
         target: targetNumber,
         message: message,
-        countryCode: "62", // Indonesia
-      }),
+        status: "PENDING",
+      }
     });
-
-    if (!response.ok) {
-      console.error("[WA Notification Error]", await response.text());
-    } else {
-      console.log(`[WA Notification] Sent to ${targetNumber}`);
-    }
+    console.log(`[WA Notification] Queued for ${targetNumber}`);
   } catch (error) {
-    console.error("[WA Notification Failed]", error);
+    console.error("[WA Notification Queue Failed]", error);
   }
 }
 
@@ -58,23 +41,21 @@ async function sendWhatsAppMessage(targetNumber: string, message: string) {
  * Fungsi pembantu untuk mengirim Email.
  */
 async function sendEmail(to: string, subject: string, html: string) {
-  if (!process.env.SMTP_USER) {
-    console.log("[Email Notification] Skipped. SMTP_USER missing.");
-    return;
-  }
-  
   if (!to) return;
 
   try {
-    await transporter.sendMail({
-      from: `"Sistem SIPASI" <${process.env.SMTP_USER}>`,
-      to,
-      subject,
-      html,
+    await prisma.notificationQueue.create({
+      data: {
+        type: "EMAIL",
+        target: to,
+        subject: subject,
+        message: html,
+        status: "PENDING",
+      }
     });
-    console.log(`[Email Notification] Sent to ${to}`);
+    console.log(`[Email Notification] Queued for ${to}`);
   } catch (error) {
-    console.error("[Email Notification Failed]", error);
+    console.error("[Email Notification Queue Failed]", error);
   }
 }
 

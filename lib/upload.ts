@@ -51,9 +51,16 @@ export async function saveUploadedFile(
   mimeType: string,
   subDir = "documents"
 ): Promise<UploadResult> {
-  const ext = path.extname(originalName) || mimeTypeToExt(mimeType);
+  const { fileTypeFromBuffer } = await import("file-type");
+  const type = await fileTypeFromBuffer(buffer);
+
+  if (!type || !ALLOWED_MIME.includes(type.mime)) {
+    throw new Error(`Tipe file tidak diizinkan atau terdeteksi palsu. Detected: ${type?.mime}`);
+  }
+
+  const ext = path.extname(originalName) || mimeTypeToExt(type.mime);
   const uniqueName = `${uuidv4()}${ext}`;
-  const uploadDir = path.join(process.cwd(), "public", "uploads", subDir);
+  const uploadDir = path.join(process.cwd(), "private_storage", "uploads", subDir);
 
   await fs.mkdir(uploadDir, { recursive: true });
 
@@ -62,9 +69,9 @@ export async function saveUploadedFile(
 
   return {
     fileName: originalName,
-    filePath: `/uploads/${subDir}/${uniqueName}`,
+    filePath: `/api/documents/download/${subDir}/${uniqueName}`,
     fileSize: buffer.length,
-    mimeType,
+    mimeType: type.mime,
   };
 }
 

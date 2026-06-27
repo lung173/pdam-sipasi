@@ -119,15 +119,15 @@ function EventDetailModal({
           <div className="mt-3">
             {daysLeft < 0 ? (
               <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/20 text-xs font-bold">
-                ✓ Sudah Berlalu
+                Sudah Berlalu
               </span>
             ) : daysLeft === 0 ? (
               <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/30 text-xs font-bold animate-pulse">
-                🔴 Hari Ini!
+                Hari Ini!
               </span>
             ) : (
               <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/20 text-xs font-bold">
-                ⏳ {daysLeft} hari lagi
+                {daysLeft} hari lagi
               </span>
             )}
           </div>
@@ -317,7 +317,7 @@ export function KalenderInternal() {
       if (json.success) {
         toast.success(
           json.sent > 0
-            ? `✅ ${json.sent} reminder terkirim!`
+            ? `${json.sent} reminder terkirim!`
             : "Tidak ada reminder yang perlu dikirim sekarang."
         );
         fetchEvents();
