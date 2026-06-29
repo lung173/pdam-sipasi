@@ -47,7 +47,7 @@ export async function POST(req: NextRequest, props: Params) {
 
       // Logika Penentuan Status Selanjutnya
       let nextStatus = "KEPUTUSAN_DIREKTUR_SELESAI";
-      let nextHolder = "AGENDARIS";
+      const nextHolder = "AGENDARIS";
       let auditExtraDescription = "";
 
       // AUTO-SIGN LOGIC — skip jika batalTandaTangan = true

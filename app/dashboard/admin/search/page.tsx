@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, Suspense, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { format } from "date-fns";
@@ -37,15 +37,7 @@ function GlobalSearchClient() {
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
 
-  // Debounce search
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      fetchDocuments(1);
-    }, 500);
-    return () => clearTimeout(handler);
-  }, [search, filterType]);
-
-  const fetchDocuments = async (pageNum: number) => {
+  const fetchDocuments = useCallback(async (pageNum: number) => {
     setLoading(true);
     try {
       const params = new URLSearchParams({
@@ -71,7 +63,15 @@ function GlobalSearchClient() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [search, filterType]);
+
+  // Debounce search
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      fetchDocuments(1);
+    }, 500);
+    return () => clearTimeout(handler);
+  }, [search, filterType, fetchDocuments]);
 
   const handleExport = () => {
     const params = new URLSearchParams();

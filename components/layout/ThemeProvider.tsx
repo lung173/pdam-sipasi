@@ -20,6 +20,13 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<Theme>("light");
   const [mounted, setMounted] = useState(false);
 
+  const applyTheme = (t: Theme) => {
+    const root = window.document.documentElement;
+    root.classList.remove("light", "dark");
+    root.classList.add(t);
+    localStorage.setItem("theme", t);
+  };
+
   useEffect(() => {
     // Ambil tema dari localStorage, default ke terang jika belum ada
     const savedTheme = localStorage.getItem("theme") as Theme;
@@ -28,13 +35,6 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     applyTheme(initialTheme);
     setMounted(true);
   }, []);
-
-  const applyTheme = (t: Theme) => {
-    const root = window.document.documentElement;
-    root.classList.remove("light", "dark");
-    root.classList.add(t);
-    localStorage.setItem("theme", t);
-  };
 
   const toggleTheme = () => {
     const newTheme = theme === "light" ? "dark" : "light";

@@ -101,7 +101,7 @@ export async function GET(req: NextRequest) {
            const tempat = u.tempat || "";
            const date = u.tanggal ? format(new Date(u.tanggal), "dd MMMM yyyy", { locale: localeId }) : "";
            
-           let ketLines = [
+           const ketLines = [
              `HARI : ${u.hari || "-"}, ${date}`,
              `PUKUL : ${jam}`,
            ];
